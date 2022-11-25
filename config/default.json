@@ -1,0 +1,8 @@
+{
+    "name": "express app",
+    "version": "1.0.0",
+    "db": {
+        "address": "mongodb://localhost:27017/auth"
+    },
+    "jwt_key": "a;lksjfl;akjsflkjas;lkj;laksjd;flkjas"
+}
