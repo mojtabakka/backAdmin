@@ -47,4 +47,14 @@ module.exports = new (class extends controller {
       });
     }
   }
+
+  async uploadPhoto(req, res) {
+    
+    console.log(req);
+    this.response({
+      res,
+      message: "uploaded successfully",
+      data: null,
+    });
+  }
 })();
