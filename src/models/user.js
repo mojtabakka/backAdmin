@@ -34,6 +34,9 @@ const userSkema = new mongoose.Schema({
   isAdmin: {
     type: Boolean,
   },
+  avatar: {
+    type: String,
+  },
 });
 userSkema.plugin(timeStamp);
 
