@@ -5,17 +5,18 @@ const User = require("../models/user");
 
 async function isLoogedin(req, res, next) {
   const expect_url = EXPECT__URL_ISLOGGEDIN.filter((item) => {
-    return "/api" + item === req.originalUrl && req.method == item.method;
+    return "/api" + item.url === req.originalUrl && req.method == item.method;
   });
-  if (expect_url.length === 0) {
-    const headerToken = req.header("Authorization");
-    token = headerToken.split(" ")[1];
-    const existTokenOnBlackList = await BlackList.findOne({ token });
-    if (existTokenOnBlackList || !token) res.status(400).send("access denied");
-    const decodedToken = jwt.verify(token, config.get("jwt_key"));
-    const user = await User.findById(decodedToken.id);
-    req.user = user;
-  }
+  const headerToken = req.header("Authorization");
+  token = headerToken.split(" ")[1];
+  const existTokenOnBlackList = await BlackList.findOne({ token });
+  if (existTokenOnBlackList || (!token && expect_url.length === 0))
+    res.status(400).send("access denied");
+  const decodedToken = jwt.verify(token, config.get("jwt_key"));
+  const user = await User.findById(decodedToken.id);
+  user.imgSrc = "asset/images/users/";
+  console.log(user);
+  req.user = user;
   next();
   try {
   } catch (ex) {
@@ -29,7 +30,7 @@ async function isAdmin(req, res, next) {
   }
 }
 
-const EXPECT__URL_ISLOGGEDIN = [{ url: "/product/product", method: "GET" }];
+const EXPECT__URL_ISLOGGEDIN = [];
 
 module.exports = {
   isLoogedin,

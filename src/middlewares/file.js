@@ -1,7 +1,7 @@
 const multer = require("multer");
 const multerConfig = multer.diskStorage({
   destination: (req, file, callback) => {
-    callback(null, "public/users/");
+    callback(null, "public/asset/images/users");
   },
   filename: (req, file, callback) => {
     const ext = file.mimetype.split("/")[1];
@@ -12,7 +12,6 @@ const multerConfig = multer.diskStorage({
   },
 });
 const isImage = (req, file, callback) => {
-  
   if (file.mimetype.startsWith("image")) {
     callback(null, true);
   } else {

@@ -1,6 +1,5 @@
 const _ = require("lodash");
 const controller = require("../controller");
-
 module.exports = new (class extends controller {
   async getUser(req, res) {
     if (req.user) {
@@ -19,16 +18,6 @@ module.exports = new (class extends controller {
   }
 
   async updateUser(req, res) {
-    console.log(
-      _.pick(req.body, [
-        "username",
-        "phoneNumber",
-        "name",
-        "lastName",
-        "email",
-        "nationalCode",
-      ])
-    );
     try {
       const user = await this.User.findOneAndUpdate(
         { _id: req.user._id },
@@ -39,6 +28,7 @@ module.exports = new (class extends controller {
           "lastName",
           "email",
           "nationalCode",
+          "avatar",
         ])
       );
       this.response({
@@ -59,7 +49,7 @@ module.exports = new (class extends controller {
     try {
       const user = await this.User.findOneAndUpdate(
         { _id: req.user._id },
-        { avatar: req?.file.filename }
+        { avatar: "asset/images/users/" + req?.file.filename }
       );
       this.response({
         res,
@@ -73,14 +63,10 @@ module.exports = new (class extends controller {
 
   async getUserPhoto(req, res) {
     try {
-      const user = await this.User.findOneAndUpdate(
-        { _id: req.user._id },
-        { avatar: req?.file.filename }
-      );
       this.response({
         res,
         message: "uploaded successfully",
-        data: user,
+        data: null,
       });
     } catch (error) {
       console.log("error", error);

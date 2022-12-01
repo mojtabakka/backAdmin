@@ -1,5 +1,4 @@
 var cors = require("cors");
-// const fileUpload = require("express-fileupload");
 const bodyParser = require("body-parser");
 // ...
 
@@ -8,6 +7,5 @@ module.exports = function (express, app) {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(bodyParser());
-  // app.use(fileUpload());
   app.use(express.static("public"));
 };

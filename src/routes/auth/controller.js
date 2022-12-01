@@ -27,8 +27,6 @@ module.exports = new (class extends controller {
     ]);
 
     items.avatar = null;
-    console.log(items);
-
     user = await this.User(items);
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
