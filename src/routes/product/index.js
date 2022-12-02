@@ -24,7 +24,6 @@ router.post(
 
 router.get(
   "/product",
-  validator.createProductValidator(),
   controller.validate.bind(controller),
   controller.getProduct.bind(controller)
 );

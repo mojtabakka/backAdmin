@@ -15,18 +15,19 @@ module.exports = new (class extends controller {
         data: null,
       });
 
-    user = await this.User(
-      _.pick(req.body, [
-        "name",
-        "email",
-        "password",
-        "name",
-        "lastName",
-        "phoneNumber",
-        "username",
-        "nationalCode",
-      ])
-    );
+    const items = _.pick(req.body, [
+      "name",
+      "email",
+      "password",
+      "name",
+      "lastName",
+      "phoneNumber",
+      "username",
+      "nationalCode",
+    ]);
+
+    items.avatar = null;
+    user = await this.User(items);
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(user.password, salt);
     await user.save();
@@ -56,7 +57,7 @@ module.exports = new (class extends controller {
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
     };
-    this.response({ res, message: "successfully loged in", data  });
+    this.response({ res, message: "successfully loged in", data });
   }
 
   async logout(req, res) {

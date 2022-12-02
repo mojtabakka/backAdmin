@@ -1,9 +1,5 @@
 const _ = require("lodash");
-const bcrypt = require("bcrypt");
-const config = require("config");
-const jwt = require("jsonwebtoken");
 const controller = require("../controller");
-
 module.exports = new (class extends controller {
   async getUser(req, res) {
     if (req.user) {
@@ -32,6 +28,7 @@ module.exports = new (class extends controller {
           "lastName",
           "email",
           "nationalCode",
+          "avatar",
         ])
       );
       this.response({
@@ -45,6 +42,34 @@ module.exports = new (class extends controller {
         message: "something went wrong",
         data: req.user,
       });
+    }
+  }
+
+  async uploadPhoto(req, res) {
+    try {
+      const user = await this.User.findOneAndUpdate(
+        { _id: req.user._id },
+        { avatar: "asset/images/users/" + req?.file.filename }
+      );
+      this.response({
+        res,
+        message: "uploaded successfully",
+        data: user,
+      });
+    } catch (error) {
+      console.log("error", error);
+    }
+  }
+
+  async getUserPhoto(req, res) {
+    try {
+      this.response({
+        res,
+        message: "uploaded successfully",
+        data: null,
+      });
+    } catch (error) {
+      console.log("error", error);
     }
   }
 })();
