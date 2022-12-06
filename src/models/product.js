@@ -9,9 +9,11 @@ const productSkema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  photo: {
+    type: String,
+  },
 });
 productSkema.plugin(timeStamp);
 
 const Product = mongoose.model("Product", productSkema);
 module.exports = Product;
-``;

@@ -2,24 +2,18 @@ const express = require("express");
 const router = express.Router();
 const controller = require("./controller");
 const validator = require("./validator");
-// router.post(
-//     "/register",
-//     validator.registerValidator(),
-//     controller.validate.bind(controller),
-//     controller.register.bind(controller)
-//   );
-
-// router.post(
-//   "/login",
-//   validator.loginValidator(),
-//   controller.validate.bind(controller),
-//   controller.login.bind(controller)
-// );
+const { uploadImage } = require("../../middlewares/file");
 router.post(
   "/product",
   validator.createProductValidator(),
   controller.validate.bind(controller),
   controller.createProduct.bind(controller)
+);
+
+router.post(
+  "/upload-product-image",
+  uploadImage,
+  controller.uploadProductImage.bind(controller)
 );
 
 router.get(

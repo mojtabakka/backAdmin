@@ -7,7 +7,7 @@ const controller = require("../controller");
 module.exports = new (class extends controller {
   async createProduct(req, res) {
     try {
-      const product = this.Product(_.pick(req.body, ["lenz", "bord"]));
+      const product = this.Product(_.pick(req.body, ["lenz", "bord", "photo"]));
       await product.save();
       this.response({
         res,
@@ -65,6 +65,7 @@ module.exports = new (class extends controller {
       const products = await this.Product.findByIdAndUpdate(req.body.id, {
         bord: req.body.bord,
         lenz: req.body.lenz,
+        photo: req.body.photo,
       });
       this.response({
         res,
@@ -79,5 +80,16 @@ module.exports = new (class extends controller {
         data: error.error,
       });
     }
+  }
+
+  async uploadProductImage(req, res) {
+    const data = {
+      src: "asset/images/products/" + req.productName,
+    };
+    this.response({
+      res,
+      message: "updated successfully",
+      data,
+    });
   }
 })();

@@ -15,7 +15,6 @@ async function isLoogedin(req, res, next) {
   const decodedToken = jwt.verify(token, config.get("jwt_key"));
   const user = await User.findById(decodedToken.id);
   user.imgSrc = "asset/images/users/";
-  console.log(user);
   req.user = user;
   next();
   try {
