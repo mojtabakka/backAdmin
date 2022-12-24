@@ -19,6 +19,12 @@ router.post(
 router.get(
   "/product",
   controller.validate.bind(controller),
+  controller.getProducts.bind(controller)
+);
+
+router.get(
+  "/product/:id",
+  controller.validate.bind(controller),
   controller.getProduct.bind(controller)
 );
 

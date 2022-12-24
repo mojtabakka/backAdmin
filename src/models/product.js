@@ -1,12 +1,30 @@
 const mongoose = require("mongoose");
 const timeStamp = require("mongoose-timestamp");
 const productSkema = new mongoose.Schema({
-  lenz: {
+  Warranty: {
+    type: String,
+    require: true,
+  },
+  model: {
     type: String,
     required: true,
   },
-  bord: {
+  price: {
     type: String,
+  },
+  features: {
+    type: String,
+  },
+  priceForUser: {
+    type: String,
+    required: true,
+  },
+  priceForWorkmate: {
+    type: String,
+    required: true,
+  },
+  exist: {
+    type: Boolean,
     required: true,
   },
   photo: {

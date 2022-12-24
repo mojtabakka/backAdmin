@@ -6,8 +6,20 @@ const controller = require("../controller");
 
 module.exports = new (class extends controller {
   async createProduct(req, res) {
+    const features = JSON.stringify(req.body.features);
     try {
-      const product = this.Product(_.pick(req.body, ["lenz", "bord", "photo"]));
+      const product = this.Product(
+        _.pick(req.body, [
+          "priceForUser",
+          "photo",
+          "model",
+          "price",
+          "exist",
+          "priceForWorkmate",
+          "warranty",
+        ])
+      );
+      product.features = features;
       await product.save();
       this.response({
         res,
@@ -24,13 +36,52 @@ module.exports = new (class extends controller {
     }
   }
 
-  async getProduct(req, res) {
+  async getProducts(req, res) {
     try {
       const products = await this.Product.find({});
+      const finalProducts = products.map((item) => {
+        let features = null;
+        if (item?.features) {
+          features = JSON.parse(item?.features);
+        }
+
+        const item2 = {
+          ...item._doc,
+          features,
+        };
+        return {
+          ...item2,
+        };
+      });
       this.response({
         res,
         message: "successfully",
-        data: products,
+        data: finalProducts,
+      });
+    } catch (error) {
+      this.response({
+        code: 404,
+        res,
+        message: "somthing went wrong",
+        data: error.error,
+      });
+    }
+  }
+
+  async getProduct(req, res) {
+    try {
+      const id = req.params.id;
+      const product = await this.Product.findById(id);
+      let features = null;
+      if (product?.features) {
+        features = JSON.parse(product?.features);
+      }
+      product._doc.features = features;
+
+      this.response({
+        res,
+        message: "successfully",
+        data: product,
       });
     } catch (error) {
       this.response({
