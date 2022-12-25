@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const timeStamp = require("mongoose-timestamp");
 const productSkema = new mongoose.Schema({
-  Warranty: {
+  warranty: {
     type: String,
     require: true,
   },

@@ -113,15 +113,27 @@ module.exports = new (class extends controller {
 
   async editProduct(req, res) {
     try {
-      const products = await this.Product.findByIdAndUpdate(req.body.id, {
-        bord: req.body.bord,
-        lenz: req.body.lenz,
-        photo: req.body.photo,
-      });
+      const data = _.pick(req.body, [
+        "priceForUser",
+        "photo",
+        "model",
+        "price",
+        "exist",
+        "priceForWorkmate",
+        "warranty",
+        "features",
+      ]);
+      let features = null;
+      if (data?.features) {
+        features = JSON.stringify(data?.features);
+      }
+      data.features = features;
+      const product = await this.Product.findByIdAndUpdate(req.body.id, data);
+      console.log(product);
       this.response({
         res,
         message: "updated successfully",
-        data: products,
+        data: product,
       });
     } catch (error) {
       this.response({
