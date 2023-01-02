@@ -4,18 +4,34 @@ const BlackList = require("../models/blacklist");
 const User = require("../models/user");
 
 async function isLoogedin(req, res, next) {
+  let token = null;
   const expect_url = EXPECT__URL_ISLOGGEDIN.filter((item) => {
-    return "/api" + item.url === req.originalUrl && req.method == item.method;
+    const lastChar = item.url.substr(item.url.length - 2);
+    const mainAddress = "/api" + item.url.substr(0, item.url.length - 2);
+    const changeOriginRUrl = req.originalUrl.substr(0, mainAddress.length);
+    if (
+      lastChar == "/*" &&
+      req.method == item.method &&
+      mainAddress == changeOriginRUrl
+    ) {
+      return item;
+    }
+    return (
+      ("/api" + item.url).trim() === req.originalUrl.trim() &&
+      req.method == item.method
+    );
   });
-  const headerToken = req.header("Authorization");
-  token = headerToken.split(" ")[1];
-  const existTokenOnBlackList = await BlackList.findOne({ token });
-  if (existTokenOnBlackList || (!token && expect_url.length === 0))
-    res.status(400).send("access denied");
-  const decodedToken = jwt.verify(token, config.get("jwt_key"));
-  const user = await User.findById(decodedToken.id);
-  user.imgSrc = "asset/images/users/";
-  req.user = user;
+  if (expect_url.length === 0) {
+    const headerToken = req.header("Authorization");
+    if (!headerToken) return res.status(400).send("access denied");
+    token = headerToken.split(" ")[1];
+    const existTokenOnBlackList = await BlackList.findOne({ token });
+    if (existTokenOnBlackList) res.status(400).send("access denied");
+    const decodedToken = jwt.verify(token, config.get("jwt_key"));
+    const user = await User.findById(decodedToken.id);
+    user.imgSrc = "asset/images/users/";
+    req.user = user;
+  }
   next();
   try {
   } catch (ex) {
@@ -29,7 +45,16 @@ async function isAdmin(req, res, next) {
   }
 }
 
-const EXPECT__URL_ISLOGGEDIN = [];
+const EXPECT__URL_ISLOGGEDIN = [
+  {
+    url: "/product/product",
+    method: "GET",
+  },
+  {
+    url: "/product/product/*",
+    method: "GET",
+  },
+];
 
 module.exports = {
   isLoogedin,

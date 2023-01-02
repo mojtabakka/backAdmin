@@ -1,43 +1,36 @@
 const mongoose = require("mongoose");
 const timeStamp = require("mongoose-timestamp");
 const productSkema = new mongoose.Schema({
-  deliveryMethod: {
+  email: {
+    type: String,
+    unique: true,
+  },
+  nationalCode: {
+    type: String,
+  },
+  name: {
     type: String,
     required: true,
   },
-  numberOfExist: {
-    type: String,
-  },
-  warranty: {
-    type: String,
-  },
-  model: {
+  lastName: {
     type: String,
     required: true,
   },
-  price: {
+  phoneNumber: {
+    type: String,
+    unique: true,
+  },
+  password: {
     type: String,
   },
-  features: {
-    type: String,
-  },
-  priceForUser: {
-    type: String,
-    required: true,
-  },
-  priceForWorkmate: {
-    type: String,
-    required: true,
-  },
-  exist: {
+  isWorkMate: {
     type: Boolean,
-    required: true,
   },
-  photo: {
+  avatar: {
     type: String,
   },
 });
 productSkema.plugin(timeStamp);
 
-const Product = mongoose.model("Product", productSkema);
+const Product = mongoose.model("Userp", productSkema);
 module.exports = Product;

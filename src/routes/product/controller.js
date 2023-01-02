@@ -17,6 +17,9 @@ module.exports = new (class extends controller {
           "exist",
           "priceForWorkmate",
           "warranty",
+          "numberOf",
+          "numberOfExist",
+          "deliveryMethod",
         ])
       );
       product.features = features;
@@ -122,6 +125,8 @@ module.exports = new (class extends controller {
         "priceForWorkmate",
         "warranty",
         "features",
+        "numberOfExist",
+        "deliveryMethod",
       ]);
       let features = null;
       if (data?.features) {
