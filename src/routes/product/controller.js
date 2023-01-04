@@ -134,7 +134,6 @@ module.exports = new (class extends controller {
       }
       data.features = features;
       const product = await this.Product.findByIdAndUpdate(req.body.id, data);
-      console.log(product);
       this.response({
         res,
         message: "updated successfully",

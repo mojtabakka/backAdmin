@@ -1,7 +1,8 @@
-var cors = require("cors");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const logger = require("morgan");
-// ...
+const dotenv = require("dotenv");
+dotenv.config();
 
 module.exports = function (express, app) {
   app.use(cors());

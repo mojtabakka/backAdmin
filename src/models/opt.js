@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const timeStamp = require("mongoose-timestamp");
-const productSkema = new mongoose.Schema({
-  _id: {},
+const otpSkema = new mongoose.Schema({
   otp: String,
   expiration_time: {
     type: Date,
@@ -12,7 +11,7 @@ const productSkema = new mongoose.Schema({
     default: null,
   },
 });
-productSkema.plugin(timeStamp);
+otpSkema.plugin(timeStamp);
 
-const Product = mongoose.model("Otp", productSkema);
-module.exports = Product;
+const otp = mongoose.model("Otp", otpSkema);
+module.exports = otp;
