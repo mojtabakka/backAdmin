@@ -37,6 +37,10 @@ const userSkema = new mongoose.Schema({
   avatar: {
     type: String,
   },
+  propducts: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Product",
+  },
 });
 userSkema.plugin(timeStamp);
 

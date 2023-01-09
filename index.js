@@ -3,7 +3,6 @@ const app = express();
 const router = require("./src/routes");
 const dotenv = require("dotenv");
 const { PORT } = require("./config/variables");
-dotenv.config();
 
 require("./src/startdup/logging")();
 require("./src/startdup/db")();

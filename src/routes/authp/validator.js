@@ -2,45 +2,66 @@ const { check } = require("express-validator");
 const expressValidator = require("express-validator");
 
 module.exports = new (class {
-  registerValidator() {
+  // registerValidator() {
+  //   return [
+  //     check("mail").not().isEmail().withMessage(" ایمیل نمی تواند خالی باشد"),
+  //     check("name").not().isEmpty().withMessage(" نام نمی توند خالی باشد"),
+  //     check("lastName")
+  //       .not()
+  //       .isEmpty()
+  //       .withMessage(" نام خانوادگی نمی توند خالی باشد"),
+  //     check("password")
+  //       .not()
+  //       .isEmpty()
+  //       .withMessage("رمز عبور نمی تواند خالی باشد"),
+  //     check("username")
+  //       .not()
+  //       .isEmpty()
+  //       .withMessage("نام کاربری نمی تواند خالی باشد"),
+  //     check("phoneNumber")
+  //       .not()
+  //       .isEmpty()
+  //       .withMessage("شماره تماس  نمی تواند خالی باشد"),
+  //     check("nationalCode")
+  //       .not()
+  //       .isEmpty()
+  //       .withMessage("شماره ملی  نمی تواند خالی باشد"),
+  //   ];
+  // }
+
+  // loginValidator() {
+  //   return [
+  //     check("phoneNumber")
+  //       .not()
+  //       .isEmpty()
+  //       .withMessage("Phone number can not be empty"),
+  //   ];
+  // }
+
+  // logoutValidator() {
+  //   return [
+  //     check("token").not().isEmpty().withMessage("token can not be empty"),
+  //   ];
+  // }
+
+  senOptValidator() {
     return [
-      check("mail").not().isEmail().withMessage(" ایمیل نمی تواند خالی باشد"),
-      check("name").not().isEmpty().withMessage(" نام نمی توند خالی باشد"),
-      check("lastName")
-        .not()
-        .isEmpty()
-        .withMessage(" نام خانوادگی نمی توند خالی باشد"),
-      check("password")
-        .not()
-        .isEmpty()
-        .withMessage("رمز عبور نمی تواند خالی باشد"),
-      check("username")
-        .not()
-        .isEmpty()
-        .withMessage("نام کاربری نمی تواند خالی باشد"),
       check("phoneNumber")
-        .not()
-        .isEmpty()
-        .withMessage("شماره تماس  نمی تواند خالی باشد"),
-      check("nationalCode")
-        .not()
-        .isEmpty()
-        .withMessage("شماره ملی  نمی تواند خالی باشد"),
+        .notEmpty()
+        .withMessage("phoneNumber can not be empty"),
+
+      check("phoneNumber")
+        .isLength({ min: 11, max: 11 })
+        .withMessage("phoneNumber must be 11 charachter"),
     ];
   }
 
-  loginValidator() {
+  verificationValidator() {
     return [
+      check("otp").notEmpty().withMessage("otp can not be empty"),
       check("phoneNumber")
-        .not()
-        .isEmpty()
-        .withMessage("Phone number can not be empty"),
-    ];
-  }
-
-  logoutValidator() {
-    return [
-      check("token").not().isEmpty().withMessage("token can not be empty"),
+        .notEmpty()
+        .withMessage("phoneNumber can not be empty"),
     ];
   }
 })();

@@ -4,5 +4,6 @@
     "db": {
         "address": "mongodb://localhost:27017/auth"
     },
-    "jwt_key": "a;lksjfl;akjsflkjas;lkj;laksjd;flkjas"
+    "jwt_key": "a;lksjfl;akjsflkjas;lkj;laksjd;flkjas",
+    "jwtp_key": "l;aksjdf;lkajs;ldfj;laskjdf;lkjas;ldj"
 }

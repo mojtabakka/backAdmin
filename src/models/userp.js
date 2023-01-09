@@ -5,16 +5,12 @@ const productSkema = new mongoose.Schema({
     type: String,
     unique: true,
   },
-  nationalCode: {
-    type: String,
-  },
+  nationalCode: {},
   name: {
     type: String,
-    required: true,
   },
   lastName: {
     type: String,
-    required: true,
   },
   phoneNumber: {
     type: String,

@@ -3,8 +3,10 @@ const bcrypt = require("bcrypt");
 const config = require("config");
 const jwt = require("jsonwebtoken");
 const otpGenerator = require("otp-generator");
+const nodemailer = require("nodemailer");
 const { AddMinutesToDate } = require("../../utile/function.util");
 const { encode, decode } = require("../../middlewares/crypt");
+const { EMAIL_PASSWORD, EMAIL_ADDRESS } = require("../../../config/variables");
 
 const controller = require("../controller");
 
@@ -41,7 +43,9 @@ module.exports = new (class extends controller {
       data: _.pick(user, ["_id", "email", "name"]),
     });
   }
-  async login(req, res) {
+  async sendOtp(req, res) {
+    // let email_message;
+    // let email_subject;
     const otpCode = otpGenerator.generate(4, {
       digits: true,
       alphabets: false,
@@ -50,26 +54,58 @@ module.exports = new (class extends controller {
       specialChars: false,
     });
     const now = new Date();
-    const expiration_time = AddMinutesToDate(now, 10);
-    const otp = this.Opt({ otp: otpCode, expiration_time });
-    const otp_instance = await otp.save();
-    const details = {
-      timestamp: now,
-      check: "mojtaba.karimi.mo@gmail.com",
-      success: true,
-      message: "OTP sent to user",
-      otp_id: otp_instance._id,
-    };
-
-    // const encoded = await encode(JSON.stringify(details));
-
-    this.response({
-      res,
-      message: "successfully loged in",
-      data: [{ otp: null }],
+    const expiration_time = AddMinutesToDate(now, 1);
+    const otp = this.Opt({
+      phoneNumber: req.body.phoneNumber,
+      otp: otpCode,
+      expiration_time,
     });
 
-    // const user = await this.User.findOne({ email: req.body.email });
+    const otp_instance = await otp.save();
+    // const details = {
+    //   timestamp: now,
+    //   check: "mojtaba.karimi.momo@gmail.com",
+    //   success: true,
+    //   message: "OTP sent to user",
+    //   otp_id: otp_instance._id,
+    // };
+    // const encoded = await encode(JSON.stringify(details));
+
+    // this.response({
+    //   res,
+    //   message: "successfully loged in",
+    //   data: [{ otp: null }],
+    // });
+    // const {
+    //   message,
+    //   subject_mail,
+    // } = require("../../templates/email_verification");
+
+    // email_message = message(otpCode);
+    // email_subject = subject_mail;
+
+    // const transporter = nodemailer.createTransport({
+    //   host: "gmail",
+    //   port: 465,
+    //   secure: true,
+    //   auth: {
+    //     user: `${EMAIL_ADDRESS}`,
+    //     pass: `${EMAIL_PASSWORD}`,
+    //   },
+    // });
+    // console.log(transporter);
+    // const mailOptions = {
+    //   from: `"Divyansh Agarwal"<${EMAIL_ADDRESS}>`,
+    //   to: `${"mojtaba.karimi.momo@gmail.com"}`,
+    //   subject: email_subject,
+    //   text: email_message,
+    // };
+
+    // const result = await transporter.verify();
+    // console.log("hello");
+    // console.log(result);
+
+    // const user = await thisf.User.findOne({ email: req.body.email });
     // if (!user) {
     //   this.response({ res, message: "password or email invalid", code: 400 });
     // }
@@ -87,7 +123,66 @@ module.exports = new (class extends controller {
     //   lastName: user.lastName,
     //   phoneNumber: user.phoneNumber,
     // };
-    // this.response({ res, message: "successfully loged in", data });
+    this.response({
+      res,
+      message: "Otp",
+      data: {
+        sent: true,
+      },
+    });
+  }
+
+  async verification(req, res) {
+    let user;
+    let token;
+    try {
+      const otp = await this.Opt.findOne({
+        phoneNumber: req.body.phoneNumber,
+        otp: req.body.otp,
+      });
+      if (otp === null) {
+        this.response({
+          code: 400,
+          res,
+          message: "opt is invalid",
+          data: null,
+        });
+        ƒ;
+      }
+      const now = new Date().getTime() / 60000;
+      const expiration_time = otp.expiration_time / 60000;
+      const subTimes = expiration_time - now;
+      if (subTimes < 0) {
+        this.response({
+          code: 400,
+          res,
+          message: "The opt has expired",
+          data: null,
+        });
+      }
+      user = await this.UserP.findOne({
+        phoneNumber: req.body.phoneNumber,
+      });
+      if (!user) {
+        user = this.UserP({
+          phoneNumber: req.body.phoneNumber,
+        });
+        await user.save();
+      }
+
+      token = jwt.sign({ id: user._id }, config.get("jwtp_key"), {
+        expiresIn: "100d",
+      });
+      this.response({
+        res,
+        message: "verified successfully",
+        data: {
+          token,
+        },
+      });
+    } catch (error) {
+      console.log("error", error);
+    }
   }
 
   async logout(req, res) {

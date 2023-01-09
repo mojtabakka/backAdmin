@@ -10,11 +10,25 @@ const validator = require("./validator");
 //   controller.validate.bind(controller),
 //   controller.register.bind(controller)
 // );
+// router.post(
+//   "/login",
+//   validator.loginValidator(),
+//   controller.validate.bind(controller),
+//   controller.login.bind(controller)
+// );
+
 router.post(
-  "/login",
-  validator.loginValidator(),
+  "/send-otp",
+  validator.senOptValidator(),
   controller.validate.bind(controller),
-  controller.login.bind(controller)
+  controller.sendOtp.bind(controller)
+);
+
+router.post(
+  "/verification",
+  validator.verificationValidator(),
+  controller.validate.bind(controller),
+  controller.verification.bind(controller)
 );
 
 // router.post(

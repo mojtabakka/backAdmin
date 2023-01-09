@@ -6,14 +6,15 @@ const authpRouter = require("./authp");
 const userRouter = require("./user");
 const adminRouter = require("./admin");
 const productRouter = require("./product");
+const ordersRouter = require("./orders");
 const error = require("../middlewares/error");
-
 const { isLoogedin, isAdmin } = require("../middlewares/auth");
 router.use("/auth", authRouter);
 router.use("/auth-public", authpRouter);
 router.use("/user", isLoogedin, userRouter);
 router.use("/product", isLoogedin, productRouter);
 router.use("/admin", isAdmin, adminRouter);
+router.use("/order", ordersRouter);
 
 router.use(error);
 

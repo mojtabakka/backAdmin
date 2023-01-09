@@ -48,7 +48,7 @@ module.exports = new (class extends controller {
       this.response({ res, message: "password or email invalid", code: 400 });
       return false;
     }
-    const token = jwt.sign({ id: user._id }, config.get("jwt_key"), {
+    const token = jwt.sign({ id: user._id }, config.get("jwtp_key"), {
       expiresIn: "1d",
     });
     const data = {
