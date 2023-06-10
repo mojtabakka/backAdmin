@@ -14,34 +14,27 @@ export class AddressService {
   ) {}
 
   async getAddresses(user: any): Promise<Address[] | undefined> {
-    try {
-      const address = await this.addressRepository
-        .createQueryBuilder('address')
-        .where('userId=:id', {
-          id: user.sub,
-        })
-        .getMany();
+    const address = await this.addressRepository
+      .createQueryBuilder('address')
+      .where('userId=:id', {
+        id: user.sub,
+      })
+      .getMany();
 
-      return address;
-    } catch (error) {
-      throw new HttpException(error.response, error.status);
-    }
+    return address;
   }
 
-  async getActiveAddress(user: any): Promise<Address | undefined> {
-    try {
-      const address = await this.addressRepository
-        .createQueryBuilder('address')
-        .where('userId=:id and active=1', {
-          id: user.sub,
-        })
-        .getOne();
+  async getActiveAddress(id: number): Promise<Address | undefined> {
+    const address = await this.addressRepository
+      .createQueryBuilder('address')
+      .where('userId=:id and active=1', {
+        id,
+      })
+      .getOne();
 
-      return address;
-    } catch (error) {
-      throw new HttpException(error.response, error.status);
-    }
+    return address;
   }
+
   async createAddress(
     crateAddresDetial: CreateAddress,
     userInfo: any,
@@ -66,34 +59,22 @@ export class AddressService {
   }
 
   async changeActiveAddress(addressId: number, userInfo: any) {
-    console.log(addressId);
-    console.log(userInfo.sub);
+    await this.addressRepository
+      .createQueryBuilder('address')
+      .update(Address)
+      .set({ active: false })
+      .where('userId=:userId', {
+        userId: userInfo.sub,
+      })
+      .execute();
 
-    try {
-      await this.addressRepository
-        .createQueryBuilder('address')
-        .update(Address)
-        .set({ active: false })
-        .where('userId=:userId', {
-          userId: userInfo.sub,
-        })
-        .execute();
-
-      const result = await this.addressRepository
-        .createQueryBuilder('address')
-        .update(Address)
-        .set({ active: true })
-        .where('id=:addressId', {
-          addressId,
-        })
-        .execute();
-    } catch (error) {
-      console.log(error);
-      throw new HttpException(error.response, error.status);
-    }
-
-    //   console.log(result);
-
-    // return result;
+    const result = await this.addressRepository
+      .createQueryBuilder('address')
+      .update(Address)
+      .set({ active: true })
+      .where('id=:addressId', {
+        addressId,
+      })
+      .execute();
   }
 }

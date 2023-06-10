@@ -5,9 +5,11 @@ import {
   UpdateDateColumn,
   Column,
   ManyToOne,
+  OneToMany,
 } from 'typeorm';
 
 import { UserPublic } from './UserPublic';
+import { Orders } from './Order';
 
 @Entity()
 export class Address {
@@ -35,11 +37,14 @@ export class Address {
   @ManyToOne(() => UserPublic, (user) => user.addresses)
   user: UserPublic;
 
-  @Column({ nullable: true })
-  address: string;
+  @OneToMany(() => Orders, (orders) => orders.address)
+  orders: Orders[];
 
   @Column({ nullable: false, default: true })
   active: boolean;
+
+  @Column({ nullable: false })
+  address: string;
 
   @CreateDateColumn({
     type: 'timestamp',

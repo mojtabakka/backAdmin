@@ -7,9 +7,11 @@ import {
   JoinTable,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { UserPublic } from './UserPublic';
 import { Product } from './Product';
+import { Orders } from './Order';
 
 @Entity()
 export class Basket {
@@ -26,9 +28,12 @@ export class Basket {
   @JoinColumn()
   user: UserPublic;
 
-  @ManyToMany(() => Product, (product) => product.baskets)
+  @ManyToMany(() => Product , (product) => product.baskets)
   @JoinTable()
   products: Product[];
+
+  @OneToMany(() => Orders, (orders) => orders.cart)
+  orders: Orders[];
 
   @UpdateDateColumn({
     type: 'timestamp',

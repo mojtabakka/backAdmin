@@ -10,4 +10,7 @@ export enum ProductStatuses {
 export enum orderStatus {
   NotPayed = 'notPayed',
   Payed = 'payed',
+  Preparing = 'preparing',
+  IsSendig = 'isSending',
+  Completed = 'completed',
 }

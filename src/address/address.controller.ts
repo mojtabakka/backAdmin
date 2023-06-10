@@ -20,33 +20,21 @@ export class AddressController {
   @Roles(Role.User)
   @Get()
   async getAddresses(@Req() req, @Res() res) {
-    try {
-      const address = await this.addressService.getAddresses(req.user);
-      res.status(HttpStatus.OK).json({
-        message: 'successfully',
-        data: address,
-      });
-    } catch (error) {
-      res.status(error.status).json({
-        mesxsage: error.response,
-      });
-    }
+    const address = await this.addressService.getAddresses(req.user);
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data: address,
+    });
   }
 
   @Roles(Role.User)
   @Get('get-active-address')
   async getActiveAddress(@Req() req, @Res() res) {
-    try {
-      const address = await this.addressService.getActiveAddress(req.user);
-      res.status(HttpStatus.OK).json({
-        message: 'successfully',
-        data: address,
-      });
-    } catch (error) {
-      res.status(error.status).json({
-        mesxsage: error.response,
-      });
-    }
+    const address = await this.addressService.getActiveAddress(req.user.sub);
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data: address,
+    });
   }
 
   @Roles(Role.User)
@@ -56,21 +44,14 @@ export class AddressController {
     @Req() req,
     @Res() res,
   ) {
-    try {
-      const address = await this.addressService.createAddress(
-        createAddressDto,
-        req.user,
-      );
-      res.status(HttpStatus.OK).json({
-        message: 'address created successfully',
-        data: address,
-      });
-    } catch (error) {
-      console.log(error);
-      res.status(error.status).json({
-        mesxsage: error.response,
-      });
-    }
+    const address = await this.addressService.createAddress(
+      createAddressDto,
+      req.user,
+    );
+    res.status(HttpStatus.OK).json({
+      message: 'address created successfully',
+      data: address,
+    });
   }
 
   @Roles(Role.User)
@@ -81,15 +62,9 @@ export class AddressController {
     req,
     @Res() res,
   ) {
-    try {
-      await this.addressService.changeActiveAddress(id, req.user);
-      res.status(HttpStatus.OK).json({
-        message: 'active address changed successfully',
-      });
-    } catch (error) {
-      res.status(error.status).json({
-        mesxsage: error.response,
-      });
-    }
+    await this.addressService.changeActiveAddress(id, req.user);
+    res.status(HttpStatus.OK).json({
+      message: 'active address changed successfully',
+    });
   }
 }

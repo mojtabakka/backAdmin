@@ -11,6 +11,8 @@ import { Product } from 'src/typeorm/entities/Product';
 import { ProductPhoto } from 'src/typeorm/entities/ProductPhoto';
 import { Orders } from 'src/typeorm/entities/Order';
 import { Basket } from 'src/typeorm/entities/‌Basket';
+import { Address } from 'src/typeorm/entities/Address';
+import { AddressService } from 'src/address/address.service';
 
 @Module({
   imports: [
@@ -21,10 +23,11 @@ import { Basket } from 'src/typeorm/entities/‌Basket';
       Product,
       ProductPhoto,
       Orders,
-      Basket
+      Basket,
+      Address,
     ]),
   ],
   controllers: [OrdersController],
-  providers: [OrdersService, UsersService, ProductService],
+  providers: [OrdersService, UsersService, ProductService, AddressService],
 })
 export class OrdersModule {}

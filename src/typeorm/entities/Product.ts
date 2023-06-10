@@ -58,9 +58,6 @@ export class Product {
   @ManyToOne(() => User, (user) => user.product)
   author: User;
 
-  @ManyToOne(() => Orders, (order) => order.products)
-  order: Orders;
-
   @ManyToMany(() => Basket, (basket) => basket.products)
   baskets: Basket[];
 

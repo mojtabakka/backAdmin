@@ -101,48 +101,41 @@ export class AuthController {
     @Res({ passthrough: true }) response: Response,
   ) {
     let user;
-    try {
-      const otp = await this.authService.findOtp(OtpCode.otp);
+    const otp = await this.authService.findOtp(OtpCode.otp);
 
-      if (otp === null) {
-        res.status(HttpStatus.NOT_FOUND).json({
-          message: 'otp in ivalid',
-        });
-        return;
-      }
-
-      const now = new Date().getTime() / 60000;
-
-      const optExpiration = otp.expiration;
-      const expiration_time = optExpiration.getTime() / 60000;
-      const subTimes = expiration_time - now;
-      if (subTimes < 0) {
-        res.status(HttpStatus.BAD_REQUEST).json({
-          message: 'The opt has expired',
-          data: null,
-        });
-        return;
-      }
-
-      user = await this.userService.getPublicUser(
-        createUserPublicDto.phoneNumber,
-      );
-
-      if (!user) {
-        user = await this.userService.createUserPublic(createUserPublicDto);
-      }
-      const token = await this.authService.signInPublic(user);
-      response.cookie('token', token.token, {
-        httpOnly: false,
+    if (otp === null) {
+      res.status(HttpStatus.NOT_FOUND).json({
+        message: 'otp in ivalid',
       });
-      res.status(HttpStatus.OK).json({
-        message: 'verified successfully',
-        data: {
-          token,
-        },
-      });
-    } catch (error) {
-      console.log('error', error);
+      return;
     }
+    const now = new Date().getTime() / 60000;
+    const optExpiration = otp.expiration;
+    const expiration_time = optExpiration.getTime() / 60000;
+    const subTimes = expiration_time - now;
+    if (subTimes < 0) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        message: 'The opt has expired',
+        data: null,
+      });
+      return;
+    }
+
+    user = await this.userService.getPublicUser(
+      createUserPublicDto.phoneNumber,
+    );
+    if (!user) {
+      user = await this.userService.createUserPublic(createUserPublicDto);
+    }
+    const token = await this.authService.signInPublic(user);
+    response.cookie('token', token.token, {
+      httpOnly: false,
+    });
+    res.status(HttpStatus.OK).json({
+      message: 'verified successfully',
+      data: {
+        token,
+      },
+    });
   }
 }

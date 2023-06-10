@@ -21,7 +21,7 @@ import { jwtConstants } from 'src/common/constants/config';
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60h' },
+      signOptions: { expiresIn: '160h' },
     }),
   ],
   providers: [
