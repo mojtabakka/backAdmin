@@ -32,7 +32,17 @@ export class OrdersController {
   @Roles(Role.User)
   @Get('current-orders')
   async getCurrentOrders(@Req() req, @Res() res) {
-    const orders = await this.orderService.getCurrentOrders(req.user);
+    const orders = await this.orderService.getCurrentOrders(req.user.sub);
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data: orders,
+    });
+  }
+
+  @Roles(Role.User)
+  @Get('previous-orders')
+  async getPreviousOrders(@Req() req, @Res() res) {
+    const orders = await this.orderService.getPreviousOrders(req.user.sub);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
       data: orders,

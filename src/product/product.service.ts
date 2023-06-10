@@ -79,7 +79,6 @@ export class ProductService {
       .groupBy('product.model')
       .where('product.model = :model', { model: model.trim() })
       .getOne();
-
     return product;
   }
 

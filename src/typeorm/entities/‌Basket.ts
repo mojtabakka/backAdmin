@@ -8,6 +8,7 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  Column,
 } from 'typeorm';
 import { UserPublic } from './UserPublic';
 import { Product } from './Product';
@@ -17,6 +18,18 @@ import { Orders } from './Order';
 export class Basket {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ nullable: true })
+  purePrice: number;
+
+  @Column({ nullable: true })
+  finalPrice: number;
+
+  @Column({ nullable: true })
+  benefit: number;
+
+  @Column({ nullable: true })
+  shippingPrice: number;
 
   @CreateDateColumn({
     type: 'timestamp',
@@ -28,7 +41,7 @@ export class Basket {
   @JoinColumn()
   user: UserPublic;
 
-  @ManyToMany(() => Product , (product) => product.baskets)
+  @ManyToMany(() => Product, (product) => product.baskets)
   @JoinTable()
   products: Product[];
 

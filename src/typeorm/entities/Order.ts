@@ -28,6 +28,15 @@ export class Orders {
   @Column({ nullable: true })
   shippingTime: string;
 
+  @Column({ nullable: true })
+  price: number;
+
+  @Column({ nullable: true })
+  finalPrice: number;
+
+  @Column({ nullable: true })
+  shippingPrice: number;
+
   @ManyToOne(() => UserPublic, (userPublic) => userPublic.orders)
   user: UserPublic;
 
