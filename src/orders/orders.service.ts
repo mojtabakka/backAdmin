@@ -1,6 +1,5 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { log } from 'console';
 import { Response } from 'express';
 import { AddressService } from 'src/address/address.service';
 import { isEmptyArray, isEmptyObject } from 'src/common/utils/functions.utils';
@@ -11,6 +10,7 @@ import { Product } from 'src/typeorm/entities/Product';
 import { Basket } from 'src/typeorm/entities/‌Basket';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
+import { searchOrder } from './utils/types/searchOrder';
 
 @Injectable()
 export class OrdersService {
@@ -250,5 +250,54 @@ export class OrdersService {
       })
       .execute();
     return result;
+  }
+
+  async getOrder(id: number): Promise<Orders | undefined> {
+    const result = await this.ordersRepository
+      .createQueryBuilder('orders')
+      .leftJoinAndSelect('orders.address', 'address')
+      .leftJoinAndSelect('orders.cart', 'cart')
+      .leftJoinAndSelect('cart.products', 'products')
+      .leftJoinAndSelect('orders.user', 'user')
+      .leftJoinAndSelect('products.photos', 'photos')
+      .where('orders.id=:id', { id })
+      .getOne();
+    return result;
+  }
+
+  async searchOrder(
+    searchOrderDetail: searchOrder,
+  ): Promise<Orders[] | undefined> {
+    const { name, lastName, nationalCode, phoneNumber, model, state, city } =
+      searchOrderDetail;
+    let result = this.ordersRepository
+      .createQueryBuilder('orders')
+      .leftJoinAndSelect('orders.address', 'address')
+      .leftJoinAndSelect('orders.cart', 'cart')
+      .leftJoinAndSelect('cart.products', 'products')
+      .leftJoinAndSelect('orders.user', 'user')
+      .leftJoinAndSelect('products.photos', 'photos');
+    if (name) {
+      result = result.where('user.name=:name', { name });
+    }
+    if (lastName) {
+      result = result.andWhere('user.lastName=:lastName', { lastName });
+    }
+    if (phoneNumber) {
+      result = result.andWhere('user.nationalCode=:nationalCode', { nationalCode });
+    }
+    if (nationalCode) {
+      result = result.andWhere('user.phoneNumber=:phoneNumber', { phoneNumber });
+    }
+    if (model) {
+      result = result.andWhere('products.model=:model', { model });
+    }
+    if (state) {
+      result = result.andWhere('address.state=:state', { state });
+    }
+    if (city) {
+      result = result.andWhere('address.city=:city', { city });
+    }
+    return result.getMany();
   }
 }

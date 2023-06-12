@@ -14,6 +14,7 @@ import {
 import { Roles } from 'src/decorators/roldes.decorator';
 import { Role } from 'src/enums/enums.enum';
 import { OrdersService } from './orders.service';
+import { SearchOrderDto } from './dtos/serchOrder.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -118,6 +119,18 @@ export class OrdersController {
     });
   }
 
+  @Roles(Role.User)
+  @Get(':id')
+  async getOrder(@Param('id') id: number, @Res() res) {
+    console.log(id);
+
+    const data = await this.orderService.getOrder(id);
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data,
+    });
+  }
+
   @Roles(Role.Admin)
   @Patch('change-order-status/:id')
   async changeOrderStatus(
@@ -127,6 +140,20 @@ export class OrdersController {
     @Res() res,
   ) {
     const data = await this.orderService.changeOrderStatus(id, status.state);
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data,
+    });
+  }
+
+  @Roles(Role.Admin)
+  @Post('search-order-admin')
+  async searchProductsAdmin(
+    @Body() searchOrderDto: SearchOrderDto,
+    @Req() req,
+    @Res() res,
+  ) {
+    const data = await this.orderService.searchOrder(searchOrderDto);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
       data,
