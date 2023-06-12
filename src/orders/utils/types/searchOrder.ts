@@ -6,4 +6,5 @@ export type searchOrder = {
   model: string;
   state: string;
   city: string;
+  status: string;
 };

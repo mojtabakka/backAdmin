@@ -6,4 +6,5 @@ export interface SearchOrderDto {
   model: string;
   state: string;
   city: string;
+  status: string;
 }

@@ -268,8 +268,16 @@ export class OrdersService {
   async searchOrder(
     searchOrderDetail: searchOrder,
   ): Promise<Orders[] | undefined> {
-    const { name, lastName, nationalCode, phoneNumber, model, state, city } =
-      searchOrderDetail;
+    const {
+      name,
+      lastName,
+      nationalCode,
+      phoneNumber,
+      model,
+      state,
+      city,
+      status,
+    } = searchOrderDetail;
     let result = this.ordersRepository
       .createQueryBuilder('orders')
       .leftJoinAndSelect('orders.address', 'address')
@@ -278,26 +286,45 @@ export class OrdersService {
       .leftJoinAndSelect('orders.user', 'user')
       .leftJoinAndSelect('products.photos', 'photos');
     if (name) {
-      result = result.where('user.name=:name', { name });
+      result = result.where('user.name LIKE :name ', { name: `%${name}%` });
     }
     if (lastName) {
-      result = result.andWhere('user.lastName=:lastName', { lastName });
+      result = result.andWhere('user.lastName LIKE :lastName ', {
+        lastName: `%${lastName}%`,
+      });
     }
     if (phoneNumber) {
-      result = result.andWhere('user.nationalCode=:nationalCode', { nationalCode });
+      result = result.andWhere('user.phoneNumber LIKE :phoneNumber ', {
+        phoneNumber: `%${phoneNumber}%`,
+      });
     }
     if (nationalCode) {
-      result = result.andWhere('user.phoneNumber=:phoneNumber', { phoneNumber });
+      result = result.andWhere('user.nationalCode LIKE :nationalCode ', {
+        nationalCode: `%${nationalCode}%`,
+      });
     }
     if (model) {
-      result = result.andWhere('products.model=:model', { model });
+      result = result.andWhere('products.model LIKE :model ', {
+        model: `%${model}%`,
+      });
     }
     if (state) {
-      result = result.andWhere('address.state=:state', { state });
+      result = result.andWhere('address.state LIKE  :state ', {
+        state: `%${state}%`,
+      });
     }
     if (city) {
-      result = result.andWhere('address.city=:city', { city });
+      result = result.andWhere('address.city LIKE :city ', {
+        city: `%${city}%`,
+      });
     }
+
+    if (status) {
+      result = result.andWhere('orders.status=:status ', {
+        status,
+      });
+    }
+
     return result.getMany();
   }
 }

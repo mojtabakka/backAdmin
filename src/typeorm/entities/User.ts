@@ -9,7 +9,6 @@ import {
 import { Role } from './Role';
 import { Product } from './Product';
 import { UserPhoto } from './UserPhoto';
-import { Address } from './Address';
 
 @Entity()
 export class User {
