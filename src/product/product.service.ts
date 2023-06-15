@@ -7,7 +7,10 @@ import { UsersService } from 'src/users/users.service';
 import { EditProduct } from './utils/types';
 import { ProductPhoto } from 'src/typeorm/entities/ProductPhoto';
 import { ProductStatuses } from 'src/enums/enums.enum';
-import { isEmptyArray } from 'src/common/utils/functions.utils';
+import {
+  getWordsonPersiankyboard,
+  isEmptyArray,
+} from 'src/common/utils/functions.utils';
 @Injectable()
 export class ProductService {
   constructor(
@@ -21,6 +24,7 @@ export class ProductService {
   async createProduct(
     detailCreateProduct: CreateProduct,
     numberOfExist: number,
+
     username: string,
   ): Promise<Product[] | undefined> {
     const products: Product[] = [];
@@ -160,5 +164,18 @@ export class ProductService {
       );
     }
     return finalProducts.filter((item) => item !== null)[0];
+  }
+
+  async searchProduct(searchItem: string): Promise<Product[] | undefined> {
+    const updateProduct = await this.productRepository
+      .createQueryBuilder('product')
+      .where(
+        'product.model LIKE :searchItem OR product.priceForUser LIKE :searchItem  or product.features  LIKE :searchItem ',
+        {
+          searchItem: `%${searchItem}%`,
+        },
+      )
+      .getMany();
+    return updateProduct;
   }
 }

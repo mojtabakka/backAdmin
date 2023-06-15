@@ -25,6 +25,10 @@ import { OrdersModule } from './orders/orders.module';
 import { Basket } from './typeorm/entities/‌Basket';
 import { Address } from './typeorm/entities/Address';
 import { AddressModule } from './address/address.module';
+import { ProductTypes } from './typeorm/entities/ProductTypes';
+import { TypeModule } from './type/type.module';
+import { Brands } from './typeorm/entities/Brands';
+import { Category } from './typeorm/entities/Category';
 
 @Module({
   imports: [
@@ -53,6 +57,9 @@ import { AddressModule } from './address/address.module';
         Orders,
         Basket,
         Address,
+        ProductTypes,
+        Brands,
+        Category
       ],
       synchronize: true,
     }),
@@ -62,6 +69,7 @@ import { AddressModule } from './address/address.module';
     CaslModule,
     OrdersModule,
     AddressModule,
+    TypeModule,
   ],
   controllers: [AppController, ProductController],
   providers: [AppService, ProductService],

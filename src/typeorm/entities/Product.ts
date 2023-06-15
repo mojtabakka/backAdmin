@@ -6,12 +6,16 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { User } from './User';
 import { IsEmpty } from 'class-validator';
 import { ProductPhoto } from './ProductPhoto';
 import { Orders } from './Order';
 import { Basket } from './‌Basket';
+import { Brands } from './Brands';
+import { Category } from './Category';
+import { ProductTypes } from './ProductTypes';
 
 @Entity()
 export class Product {
@@ -51,6 +55,18 @@ export class Product {
 
   @Column({ nullable: true })
   shippingCost: string;
+
+  @ManyToMany(() => Brands, (brand) => brand.products)
+  @JoinTable()
+  brands: Brands[];
+
+  @ManyToMany(() => Category, (category) => category.products)
+  @JoinTable()
+  categories: Category[];
+
+  @ManyToMany(() => ProductTypes, (type) => type.products)
+  @JoinTable()
+  productTypes: ProductTypes[];
 
   @ManyToMany(() => ProductPhoto, (ProductPhoto) => ProductPhoto.products)
   photos: ProductPhoto[];
