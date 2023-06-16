@@ -10,4 +10,7 @@ export class CreateProductDto {
   priceForUser: string;
   priceForWorkmate: string;
   warranty: string;
+  categories;
+  brands;
+  types;
 }

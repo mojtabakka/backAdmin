@@ -130,6 +130,8 @@ export class ProductController {
     @Body() editProductDto: EditProductDto,
     @Res() res: Response,
   ) {
+    console.log(editProductDto);
+
     const data = await this.productService.editProduct(id, editProductDto);
     res.status(HttpStatus.OK).json({
       message: 'Product Updated successfully',
@@ -140,8 +142,6 @@ export class ProductController {
   @Roles(Role.User)
   @Get('public/product-search/product-search')
   async serchProduct(@Query() search, @Res() res: Response) {
-    console.log('search', search.search);
-
     const data = await this.productService.searchProduct(search.search);
     res.status(HttpStatus.OK).json({
       message: 'Product Updated successfully',

@@ -11,7 +11,6 @@ import {
 import { User } from './User';
 import { IsEmpty } from 'class-validator';
 import { ProductPhoto } from './ProductPhoto';
-import { Orders } from './Order';
 import { Basket } from './‌Basket';
 import { Brands } from './Brands';
 import { Category } from './Category';

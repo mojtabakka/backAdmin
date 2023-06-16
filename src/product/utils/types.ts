@@ -13,6 +13,9 @@ export type CreateProduct = {
   priceForWorkmate: string;
   exist: boolean;
   off: number;
+  categories;
+  brands;
+  types;
 };
 
 export type EditProduct = {
@@ -27,4 +30,7 @@ export type EditProduct = {
   priceForWorkmate: string;
   exist: boolean;
   off: number;
+  categories;
+  brands;
+  types;
 };

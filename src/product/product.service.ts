@@ -44,9 +44,15 @@ export class ProductService {
           features,
           author: user,
           photos: productPhoto,
+          brands: detailCreateProduct.brands,
+          productTypes: detailCreateProduct.types,
+          categories: [{ id: detailCreateProduct.categories }],
         }),
       );
     }
+
+    console.log('products', products);
+
     const product = await this.productRepository.save(products);
 
     return { ...product };
@@ -61,7 +67,12 @@ export class ProductService {
   }
 
   async getProducts() {
-    const products = await this.productRepository.find();
+    const products = await this.productRepository
+      .createQueryBuilder('product')
+      .groupBy('product.model')
+      .select('*')
+      .addSelect(['COUNT(product.id) as numberOfExist'])
+      .getRawMany();
     return products;
   }
 
@@ -69,6 +80,9 @@ export class ProductService {
     const products = await this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.photos', 'photos')
+      .leftJoinAndSelect('product.brands', 'brands')
+      .leftJoinAndSelect('product.productTypes', 'types')
+      .leftJoinAndSelect('product.categories', 'types')
       .groupBy('product.model')
       .select('*')
       .addSelect(['COUNT(product.id) as numberOfExist'])
@@ -86,8 +100,15 @@ export class ProductService {
     return product;
   }
 
-  getProduct(id: number) {
-    return this.productRepository.findOneBy({ id });
+  getProduct(id: number): Promise<Product | undefined> {
+    return this.productRepository.findOne({
+      where: { id },
+      relations: {
+        brands: true,
+        productTypes: true,
+        categories: true,
+      },
+    });
   }
 
   deleteProduct(id: number) {
@@ -95,11 +116,31 @@ export class ProductService {
   }
 
   async editProduct(id: number, detailEditProduct: EditProduct) {
-    const updateProduct = await this.productRepository.update(id, {
-      ...detailEditProduct,
-      features: JSON.stringify(detailEditProduct.features),
-    });
-    return updateProduct;
+    const brands = detailEditProduct.brands;
+    const productTypes = detailEditProduct.types;
+    const categories = detailEditProduct.categories;
+    delete detailEditProduct.types;
+    delete detailEditProduct.brands;
+    delete detailEditProduct.categories;
+    detailEditProduct.off = Number(detailEditProduct.off);
+    detailEditProduct.features = JSON.stringify(detailEditProduct.features);
+    const updateProduct = await this.productRepository
+      .createQueryBuilder('product')
+      .update(Product)
+      .set({
+        ...detailEditProduct,
+      })
+      .where('id = :id', { id })
+      .execute();
+
+    const product = await this.productRepository.findOneBy({ id });
+
+    product.brands = brands;
+    product.productTypes = productTypes;
+    product.categories = categories;
+
+    const result = this.productRepository.save(product);
+    return result;
   }
 
   async getProductForReserve(model: string): Promise<Product | undefined> {

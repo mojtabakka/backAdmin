@@ -10,4 +10,7 @@ export type CreateProduct = {
   exist: boolean;
   photo: string;
   off: number;
+  categories;
+  brands;
+  types;
 };

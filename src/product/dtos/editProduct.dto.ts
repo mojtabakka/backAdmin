@@ -12,4 +12,7 @@ export class EditProductDto {
   priceForWorkmate: string;
   exist: boolean;
   off: number;
+  categories;
+  brands;
+  types;
 }
