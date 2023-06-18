@@ -29,6 +29,8 @@ import { ProductTypes } from './typeorm/entities/ProductTypes';
 import { TypeModule } from './type/type.module';
 import { Brands } from './typeorm/entities/Brands';
 import { Category } from './typeorm/entities/Category';
+import { PropertyTitles } from './typeorm/entities/PropertyTitles';
+import { Properties } from './typeorm/entities/Properties';
 
 @Module({
   imports: [
@@ -59,7 +61,9 @@ import { Category } from './typeorm/entities/Category';
         Address,
         ProductTypes,
         Brands,
-        Category
+        Category,
+        PropertyTitles,
+        Properties,
       ],
       synchronize: true,
     }),

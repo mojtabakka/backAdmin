@@ -85,6 +85,7 @@ export class ProductController {
   @Get('public')
   @Public()
   async getProductsPublic(@Res() res: Response) {
+    
     const data = await this.productService.getProductsForPublic();
     res.status(HttpStatus.OK).json({
       message: 'products recieved successfully',

@@ -1,8 +1,10 @@
-import { Body, Injectable } from '@nestjs/common';
+import { Body, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brands } from 'src/typeorm/entities/Brands';
 import { Category } from 'src/typeorm/entities/Category';
 import { ProductTypes } from 'src/typeorm/entities/ProductTypes';
+import { Properties } from 'src/typeorm/entities/Properties';
+import { PropertyTitles } from 'src/typeorm/entities/PropertyTitles';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -16,6 +18,12 @@ export class TypeService {
 
     @InjectRepository(Category)
     private catergoryRepository: Repository<Category>,
+
+    @InjectRepository(Properties)
+    private properitesRepository: Repository<Properties>,
+
+    @InjectRepository(PropertyTitles)
+    private propertyTitlesRepository: Repository<PropertyTitles>,
   ) {}
 
   async createProductType(type: {
@@ -78,5 +86,34 @@ export class TypeService {
         productTypes: productType === 'true' ? true : false,
       },
     });
+  }
+
+  async addProperty(items): Promise<PropertyTitles | undefined> {
+    const check = await this.propertyTitlesRepository.findOneBy({
+      title: items.title,
+    });
+
+    if (check) {
+      throw new HttpException(
+        'عنوان وارد شده قبلا استفاده شده است ',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const properties = [];
+    for (let key in items.properties) {
+      properties.push(
+        this.properitesRepository.create({
+          property: items.properties[key],
+          title: items.title,
+        }),
+      );
+    }
+    const resultProperties = await this.properitesRepository.save(properties);
+    const PropertyTitles = this.propertyTitlesRepository.create({
+      title: items.title,
+      properties: resultProperties,
+    });
+
+    return this.propertyTitlesRepository.save(PropertyTitles);
   }
 }

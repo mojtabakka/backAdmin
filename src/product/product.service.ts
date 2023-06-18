@@ -50,11 +50,7 @@ export class ProductService {
         }),
       );
     }
-
-    console.log('products', products);
-
-    const product = await this.productRepository.save(products);
-
+    const product = await this.productRepository.save(products)
     return { ...product };
   }
 
@@ -67,6 +63,8 @@ export class ProductService {
   }
 
   async getProducts() {
+    console.log('heejl');
+
     const products = await this.productRepository
       .createQueryBuilder('product')
       .groupBy('product.model')
@@ -82,7 +80,7 @@ export class ProductService {
       .leftJoinAndSelect('product.photos', 'photos')
       .leftJoinAndSelect('product.brands', 'brands')
       .leftJoinAndSelect('product.productTypes', 'types')
-      .leftJoinAndSelect('product.categories', 'types')
+      .leftJoinAndSelect('product.categories', 'category')
       .groupBy('product.model')
       .select('*')
       .addSelect(['COUNT(product.id) as numberOfExist'])

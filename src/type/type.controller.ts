@@ -83,9 +83,21 @@ export class TypeController {
   @Get('get-cat')
   @Roles(Role.Admin)
   async getca(@Query() query, @Req() req, @Res() res) {
-    console.log(query);
-    
-    const data = await this.typeService.getCat(query.id, query.brand ,query.productType);
+    const data = await this.typeService.getCat(
+      query.id,
+      query.brand,
+      query.productType,
+    );
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data,
+    });
+  }
+
+  @Post('add-property')
+  @Roles(Role.Admin)
+  async addProperty(@Body() body, @Req() req, @Res() res) {
+    const data = await this.typeService.addProperty(body);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
       data,
