@@ -85,7 +85,6 @@ export class ProductController {
   @Get('public')
   @Public()
   async getProductsPublic(@Res() res: Response) {
-    
     const data = await this.productService.getProductsForPublic();
     res.status(HttpStatus.OK).json({
       message: 'products recieved successfully',
@@ -97,7 +96,6 @@ export class ProductController {
   @Public()
   async getProductPublic(@Param('id') model: string, @Res() res: Response) {
     const data = await this.productService.getProductForPublic(model);
-    data.features = JSON.parse(data.features);
     res.status(HttpStatus.OK).json({
       message: 'product recieved successfully',
       data,
@@ -108,7 +106,6 @@ export class ProductController {
   @Public()
   async getProduct(@Param('id') id: number, @Res() res: Response) {
     const data = await this.productService.getProduct(id);
-    data.features = JSON.parse(data.features);
     res.status(HttpStatus.OK).json({
       message: 'product recieved successfully',
       data,

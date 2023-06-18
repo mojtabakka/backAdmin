@@ -19,7 +19,6 @@ export class TypeController {
   @Roles(Role.Admin)
   async CreateProduct(
     @Body() body: { type: string; title: string },
-    @Req() req,
     @Res() res,
   ) {
     const data = await this.typeService.createProductType(body);
@@ -30,7 +29,7 @@ export class TypeController {
 
   @Get()
   @Roles(Role.Admin)
-  async getProductTypes(@Req() req, @Res() res) {
+  async getProductTypes(@Res() res) {
     const data = await this.typeService.getProductTypes();
     res.status(HttpStatus.OK).json({
       data,
@@ -39,20 +38,16 @@ export class TypeController {
 
   @Post('add-brand')
   @Roles(Role.Admin)
-  async addBrands(
-    @Body() body: { brand: string; title: string },
-    @Req() req,
-    @Res() res,
-  ) {
+  async addBrands(@Body() body: { brand: string; title: string }, @Res() res) {
     const data = await this.typeService.addBrands(body);
     res.status(HttpStatus.OK).json({
       data,
     });
   }
 
-  @Post('get-brands')
+  @Get('get-brands')
   @Roles(Role.Admin)
-  async getBrands(@Req() req, @Res() res) {
+  async getBrands(@Res() res) {
     const data = await this.typeService.getBrands();
     res.status(HttpStatus.OK).json({
       message: 'successfully',
@@ -62,7 +57,7 @@ export class TypeController {
 
   @Post('cat')
   @Roles(Role.Admin)
-  async createCat(@Body() body, @Req() req, @Res() res) {
+  async createCat(@Body() body, @Res() res) {
     const data = await this.typeService.createCat(body);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
@@ -82,11 +77,12 @@ export class TypeController {
 
   @Get('get-cat')
   @Roles(Role.Admin)
-  async getca(@Query() query, @Req() req, @Res() res) {
+  async getCat(@Query() query, @Req() req, @Res() res) {
     const data = await this.typeService.getCat(
       query.id,
       query.brand,
       query.productType,
+      query.propertyTitles,
     );
     res.status(HttpStatus.OK).json({
       message: 'successfully',
@@ -98,6 +94,16 @@ export class TypeController {
   @Roles(Role.Admin)
   async addProperty(@Body() body, @Req() req, @Res() res) {
     const data = await this.typeService.addProperty(body);
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data,
+    });
+  }
+
+  @Get('get-properties')
+  @Roles(Role.Admin)
+  async getProperties(@Req() req, @Res() res) {
+    const data = await this.typeService.getProperties();
     res.status(HttpStatus.OK).json({
       message: 'successfully',
       data,

@@ -13,4 +13,5 @@ export type CreateProduct = {
   categories;
   brands;
   types;
+  properties;
 };

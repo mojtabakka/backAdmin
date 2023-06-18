@@ -15,6 +15,7 @@ import { Basket } from './‌Basket';
 import { Brands } from './Brands';
 import { Category } from './Category';
 import { ProductTypes } from './ProductTypes';
+import { Properties } from './Properties';
 
 @Entity()
 export class Product {
@@ -34,8 +35,9 @@ export class Product {
   @Column({ nullable: true })
   price: string;
 
-  @Column({ nullable: true })
-  features: string;
+  @ManyToMany(() => Properties)
+  @JoinTable()
+  properties: Properties[];
 
   @Column({ nullable: true })
   priceForUser: string;

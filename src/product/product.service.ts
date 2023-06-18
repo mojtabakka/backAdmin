@@ -28,7 +28,7 @@ export class ProductService {
     username: string,
   ): Promise<Product[] | undefined> {
     const products: Product[] = [];
-    const features = JSON.stringify(detailCreateProduct.features);
+
     const productPhoto: ProductPhoto[] = [];
     const photo = await this.productPhotoRepository.findOneBy({
       src: detailCreateProduct.photo,
@@ -36,21 +36,22 @@ export class ProductService {
     productPhoto.push(photo);
     const user = await this.usersService.findOne(username);
     delete detailCreateProduct.numberOfExist;
+    console.log(detailCreateProduct.properties);
 
     for (let i: number = 0; i < Number(numberOfExist); i++) {
       products.push(
         this.productRepository.create({
           ...detailCreateProduct,
-          features,
           author: user,
           photos: productPhoto,
           brands: detailCreateProduct.brands,
           productTypes: detailCreateProduct.types,
           categories: [{ id: detailCreateProduct.categories }],
+          properties: detailCreateProduct.properties,
         }),
       );
     }
-    const product = await this.productRepository.save(products)
+    const product = await this.productRepository.save(products);
     return { ...product };
   }
 
@@ -63,8 +64,6 @@ export class ProductService {
   }
 
   async getProducts() {
-    console.log('heejl');
-
     const products = await this.productRepository
       .createQueryBuilder('product')
       .groupBy('product.model')

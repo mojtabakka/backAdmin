@@ -18,6 +18,7 @@ import { Basket } from './‌Basket';
 import { Address } from './Address';
 import { ProductTypes } from './ProductTypes';
 import { Brands } from './Brands';
+import { PropertyTitles } from './PropertyTitles';
 
 @Entity()
 export class Category {
@@ -37,6 +38,9 @@ export class Category {
 
   @ManyToMany(() => Product, (product) => product.categories)
   products: Product[];
+
+  @OneToMany(() => PropertyTitles, (title) => title.category)
+  propertyTitles: PropertyTitles[];
 
   @CreateDateColumn({
     type: 'timestamp',

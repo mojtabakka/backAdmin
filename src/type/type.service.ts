@@ -60,6 +60,7 @@ export class TypeService {
       title: item.type,
       brands: item.brands,
       productTypes: item.types,
+      propertyTitles: item.properties,
     });
     return this.catergoryRepository.save(cat);
   }
@@ -76,16 +77,17 @@ export class TypeService {
     id: number,
     brand: string,
     productType: string,
+    propertyTitles: string,
   ): Promise<Category | undefined> {
-    return this.catergoryRepository.findOne({
-      where: {
-        id: id,
-      },
-      relations: {
-        brands: brand === 'true' ? true : false,
-        productTypes: productType === 'true' ? true : false,
-      },
-    });
+    let cats = this.catergoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.brands', 'brands')
+      .leftJoinAndSelect('category.productTypes', 'productTypes')
+      .leftJoinAndSelect('category.propertyTitles', 'propertyTitles')
+      .leftJoinAndSelect('propertyTitles.properties', 'properties')
+      .where('category.id=:id', { id })
+      .getOne();
+    return cats;
   }
 
   async addProperty(items): Promise<PropertyTitles | undefined> {
@@ -115,5 +117,9 @@ export class TypeService {
     });
 
     return this.propertyTitlesRepository.save(PropertyTitles);
+  }
+
+  async getProperties(): Promise<PropertyTitles[] | undefined> {
+    return this.propertyTitlesRepository.find();
   }
 }

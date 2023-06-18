@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { Properties } from './Properties';
+import { Category } from './Category';
 
 @Entity()
 export class PropertyTitles {
@@ -15,6 +17,9 @@ export class PropertyTitles {
 
   @Column({ unique: true })
   title: string;
+
+  @ManyToOne(() => Category, (user) => user.propertyTitles)
+  category: Category;
 
   @CreateDateColumn({
     type: 'timestamp',

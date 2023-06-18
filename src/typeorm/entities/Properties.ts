@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  ManyToMany,
 } from 'typeorm';
 import { PropertyTitles } from './PropertyTitles';
+import { Product } from './Product';
 
 @Entity()
 export class Properties {
@@ -21,6 +23,9 @@ export class Properties {
 
   @ManyToOne(() => PropertyTitles, (pt) => pt.properties)
   propertyTitle: PropertyTitles;
+
+  @ManyToMany(() => Product)
+  products: Product[]
 
   @CreateDateColumn({
     type: 'timestamp',

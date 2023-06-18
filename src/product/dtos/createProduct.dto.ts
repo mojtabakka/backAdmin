@@ -13,4 +13,5 @@ export class CreateProductDto {
   categories;
   brands;
   types;
+  properties;
 }
