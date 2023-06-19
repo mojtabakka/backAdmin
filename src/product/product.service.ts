@@ -36,7 +36,6 @@ export class ProductService {
     productPhoto.push(photo);
     const user = await this.usersService.findOne(username);
     delete detailCreateProduct.numberOfExist;
-    console.log(detailCreateProduct.properties);
 
     for (let i: number = 0; i < Number(numberOfExist); i++) {
       products.push(
@@ -104,6 +103,7 @@ export class ProductService {
         brands: true,
         productTypes: true,
         categories: true,
+        properties: true,
       },
     });
   }
@@ -116,9 +116,11 @@ export class ProductService {
     const brands = detailEditProduct.brands;
     const productTypes = detailEditProduct.types;
     const categories = detailEditProduct.categories;
+    const properties = detailEditProduct.properties;
     delete detailEditProduct.types;
     delete detailEditProduct.brands;
     delete detailEditProduct.categories;
+    delete detailEditProduct.properties;
     detailEditProduct.off = Number(detailEditProduct.off);
     detailEditProduct.features = JSON.stringify(detailEditProduct.features);
     const updateProduct = await this.productRepository
@@ -135,7 +137,7 @@ export class ProductService {
     product.brands = brands;
     product.productTypes = productTypes;
     product.categories = categories;
-
+    product.properties = properties;
     const result = this.productRepository.save(product);
     return result;
   }

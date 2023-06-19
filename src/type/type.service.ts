@@ -73,13 +73,8 @@ export class TypeService {
     return this.catergoryRepository.find({});
   }
 
-  getCat(
-    id: number,
-    brand: string,
-    productType: string,
-    propertyTitles: string,
-  ): Promise<Category | undefined> {
-    let cats = this.catergoryRepository
+  async getCat(id: number): Promise<Category | undefined> {
+    let cats = await this.catergoryRepository
       .createQueryBuilder('category')
       .leftJoinAndSelect('category.brands', 'brands')
       .leftJoinAndSelect('category.productTypes', 'productTypes')
@@ -87,6 +82,8 @@ export class TypeService {
       .leftJoinAndSelect('propertyTitles.properties', 'properties')
       .where('category.id=:id', { id })
       .getOne();
+    console.log(cats);
+
     return cats;
   }
 
@@ -101,6 +98,7 @@ export class TypeService {
         HttpStatus.BAD_REQUEST,
       );
     }
+
     const properties = [];
     for (let key in items.properties) {
       properties.push(

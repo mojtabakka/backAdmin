@@ -33,4 +33,5 @@ export type EditProduct = {
   categories;
   brands;
   types;
+  properties;
 };

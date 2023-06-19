@@ -15,4 +15,5 @@ export class EditProductDto {
   categories;
   brands;
   types;
+  properties
 }

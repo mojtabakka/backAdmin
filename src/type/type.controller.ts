@@ -78,12 +78,7 @@ export class TypeController {
   @Get('get-cat')
   @Roles(Role.Admin)
   async getCat(@Query() query, @Req() req, @Res() res) {
-    const data = await this.typeService.getCat(
-      query.id,
-      query.brand,
-      query.productType,
-      query.propertyTitles,
-    );
+    const data = await this.typeService.getCat(query.id);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
       data,
