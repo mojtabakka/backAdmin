@@ -173,13 +173,10 @@ export class ProductService {
     const products = await this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.baskets', 'basket')
-      .where(
-        'product.model=:model and (  basket.userId=:id or basket.userId IS NULL )',
-        {
-          model,
-          id,
-        },
-      )
+      .where('product.model=:model', {
+        model,
+        id,
+      })
       .getMany();
 
     const products2 = await this.productRepository
@@ -190,12 +187,14 @@ export class ProductService {
         id,
       })
       .getMany();
+
     const finalProducts = products.map((item) => {
       if (!products2.find((el) => el.id == item.id)) {
         return item;
       }
       return null;
     });
+
     const procutsNotExist = finalProducts.filter((item) => item !== null);
     if (isEmptyArray(procutsNotExist)) {
       throw new HttpException(
@@ -203,6 +202,7 @@ export class ProductService {
         HttpStatus.NOT_FOUND,
       );
     }
+
     return finalProducts.filter((item) => item !== null)[0];
   }
 

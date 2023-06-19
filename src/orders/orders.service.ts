@@ -85,13 +85,18 @@ export class OrdersService {
       .getOne();
 
     const user = await this.userService.getPublicUser(userInfo.phoneNumber);
+
     const product = await this.productService.getProductNotExistInUserBsket(
       model,
       userInfo.sub,
     );
 
-    !isEmptyArray([product, ...basket.products]) &&
-      [product, ...basket.products].map((item) => {
+    const ProductBasket = !isEmptyArray(basket?.products)
+      ? basket?.products
+      : [];
+
+    !isEmptyArray([product, ...ProductBasket]) &&
+      [product, ...ProductBasket].map((item) => {
         const benefitOfPrice = +item?.priceForUser * (+item?.off / 100);
         myBefefit += +item.priceForUser * (+item.off / 100);
         mySumPrice += +item.priceForUser;
