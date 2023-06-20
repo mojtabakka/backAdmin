@@ -72,18 +72,25 @@ export class ProductService {
     return products;
   }
 
-  async getProductsForPublic(): Promise<Product[] | undefined> {
-    const products = await this.productRepository
+  async getProductsForPublic(items): Promise<Product[] | undefined> {
+    const properties = items.properties;
+    let products = this.productRepository
       .createQueryBuilder('product')
-      .leftJoinAndSelect('product.photos', 'photos')
-      .leftJoinAndSelect('product.brands', 'brands')
-      .leftJoinAndSelect('product.productTypes', 'types')
-      .leftJoinAndSelect('product.categories', 'category')
+      .leftJoinAndSelect('product.photos', 'photos');
+    if (properties) {
+      const filter = !isEmptyArray(properties) ? properties : [properties];
+
+      products = products
+        .leftJoinAndSelect('product.properties', 'properties')
+        .where('properties.id IN(:...ids) ', { ids: filter });
+    }
+    products = products
       .groupBy('product.model')
       .select('*')
-      .addSelect(['COUNT(product.id) as numberOfExist'])
-      .getRawMany();
-    return products;
+
+      .addSelect(['COUNT(product.id) as numberOfExist']);
+
+    return products.getRawMany();
   }
 
   async getProductForPublic(model: string): Promise<Product | undefined> {

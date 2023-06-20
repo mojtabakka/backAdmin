@@ -122,7 +122,6 @@ export class OrdersController {
   @Roles(Role.User)
   @Get(':id')
   async getOrder(@Param('id') id: number, @Res() res) {
-    console.log(id);
 
     const data = await this.orderService.getOrder(id);
     res.status(HttpStatus.OK).json({

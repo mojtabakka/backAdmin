@@ -84,8 +84,8 @@ export class ProductController {
 
   @Get('public')
   @Public()
-  async getProductsPublic(@Res() res: Response) {
-    const data = await this.productService.getProductsForPublic();
+  async getProductsPublic(@Query() query, @Res() res: Response) {
+    const data = await this.productService.getProductsForPublic(query);
     res.status(HttpStatus.OK).json({
       message: 'products recieved successfully',
       data,
@@ -128,8 +128,6 @@ export class ProductController {
     @Body() editProductDto: EditProductDto,
     @Res() res: Response,
   ) {
-    console.log(editProductDto);
-
     const data = await this.productService.editProduct(id, editProductDto);
     res.status(HttpStatus.OK).json({
       message: 'Product Updated successfully',

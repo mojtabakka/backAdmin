@@ -82,7 +82,7 @@ export class TypeService {
       .leftJoinAndSelect('propertyTitles.properties', 'properties')
       .where('category.id=:id', { id })
       .getOne();
-    console.log(cats);
+
 
     return cats;
   }
