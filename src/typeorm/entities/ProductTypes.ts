@@ -8,12 +8,10 @@ import {
 } from 'typeorm';
 import { Category } from './Category';
 import { Product } from './Product';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class ProductTypes {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class ProductTypes extends AbstractEntity {
   @Column({ unique: true })
   type: string;
 
@@ -25,17 +23,4 @@ export class ProductTypes {
 
   @ManyToMany(() => Product, (product) => product.productTypes)
   products: Product[];
-
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
-  public created_at: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  public updated_at: Date;
 }

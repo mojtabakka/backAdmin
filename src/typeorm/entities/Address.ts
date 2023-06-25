@@ -10,9 +10,10 @@ import {
 
 import { UserPublic } from './UserPublic';
 import { Orders } from './Order';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class Address {
+export class Address extends AbstractEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -45,16 +46,4 @@ export class Address {
 
   @Column({ nullable: false })
   address: string;
-
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
-  created_at: Date;
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  updated_at: Date;
 }

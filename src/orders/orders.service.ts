@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'express';
 import { AddressService } from 'src/address/address.service';
 import { isEmptyArray, isEmptyObject } from 'src/common/utils/functions.utils';
-import { orderStatus } from 'src/enums/enums.enum';
+import { orderStatus } from 'src/constants';
 import { ProductService } from 'src/product/product.service';
 import { Orders } from 'src/typeorm/entities/Order';
 import { Product } from 'src/typeorm/entities/Product';

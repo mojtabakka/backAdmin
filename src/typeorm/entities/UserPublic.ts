@@ -11,9 +11,10 @@ import {
 import { UserPhoto } from './UserPhoto';
 import { Orders } from './Order';
 import { Address } from './Address';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class UserPublic {
+export class UserPublic extends AbstractEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

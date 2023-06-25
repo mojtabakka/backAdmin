@@ -9,12 +9,10 @@ import {
 } from 'typeorm';
 import { Properties } from './Properties';
 import { Category } from './Category';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class PropertyTitles {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class PropertyTitles extends AbstractEntity {
   @Column({ unique: true })
   title: string;
 

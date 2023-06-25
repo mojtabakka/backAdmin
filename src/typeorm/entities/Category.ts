@@ -13,18 +13,16 @@ import {
 } from 'typeorm';
 import { UserPublic } from './UserPublic';
 import { Product } from './Product';
-import { orderStatus } from 'src/enums/enums.enum';
+import { orderStatus } from 'src/constants';
 import { Basket } from './‌Basket';
 import { Address } from './Address';
 import { ProductTypes } from './ProductTypes';
 import { Brands } from './Brands';
 import { PropertyTitles } from './PropertyTitles';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class Category {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class Category extends AbstractEntity {
   @Column({ nullable: true })
   title: string;
 
@@ -41,17 +39,4 @@ export class Category {
 
   @OneToMany(() => PropertyTitles, (title) => title.category)
   propertyTitles: PropertyTitles[];
-
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
-  public created_at: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  public updated_at: Date;
 }

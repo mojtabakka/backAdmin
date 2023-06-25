@@ -74,15 +74,16 @@ export class TypeService {
   }
 
   async getCat(id: number): Promise<Category | undefined> {
+    console.log(id);
+
     let cats = await this.catergoryRepository
       .createQueryBuilder('category')
       .leftJoinAndSelect('category.brands', 'brands')
       .leftJoinAndSelect('category.productTypes', 'productTypes')
       .leftJoinAndSelect('category.propertyTitles', 'propertyTitles')
       .leftJoinAndSelect('propertyTitles.properties', 'properties')
-      .where('category.id=:id', { id })
+      .where('category.id=:id', { id:7 })
       .getOne();
-
 
     return cats;
   }

@@ -9,12 +9,10 @@ import {
 import { Role } from './Role';
 import { Product } from './Product';
 import { UserPhoto } from './UserPhoto';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class User extends AbstractEntity {
   @Column()
   username: string;
 
@@ -44,8 +42,6 @@ export class User {
 
   @OneToMany(() => Product, (role) => role.author)
   product: Product[];
-
-  
 
   @CreateDateColumn({
     type: 'timestamp',

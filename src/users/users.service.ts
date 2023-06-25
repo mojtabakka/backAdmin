@@ -6,7 +6,7 @@ import { CreateUser, CreateUserPublic } from './utils/types/userTypes';
 import { Role } from 'src/typeorm/entities/Role';
 import { UserPublic } from 'src/typeorm/entities/UserPublic';
 import { editPublicUser } from './dtos/editPublicUser.dto';
-import { orderStatus } from 'src/enums/enums.enum';
+import { orderStatus } from 'src/constants';
 
 @Injectable()
 export class UsersService {

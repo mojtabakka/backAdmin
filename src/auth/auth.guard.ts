@@ -13,7 +13,7 @@ import { IS_PUBLIC_KEY } from './decorators/public.decorator';
 import { ROLES_KEY } from 'src/decorators/roldes.decorator';
 import { UsersService } from 'src/users/users.service';
 import { jwtConstants } from 'src/common/constants/config';
-import { Role } from 'src/enums/enums.enum';
+import { Role } from 'src/constants';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

@@ -13,12 +13,10 @@ import {
 import { UserPublic } from './UserPublic';
 import { Product } from './Product';
 import { Orders } from './Order';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class Basket {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class Basket extends AbstractEntity {
   @Column({ nullable: true })
   purePrice: number;
 

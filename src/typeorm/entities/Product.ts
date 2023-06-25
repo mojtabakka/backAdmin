@@ -7,6 +7,7 @@ import {
   UpdateDateColumn,
   ManyToMany,
   JoinTable,
+  PrimaryColumn,
 } from 'typeorm';
 import { User } from './User';
 import { IsEmpty } from 'class-validator';
@@ -29,7 +30,7 @@ export class Product {
   @Column({ nullable: true })
   warranty: string;
 
-  @Column({ nullable: false })
+  @PrimaryColumn({ nullable: false })
   model: string;
 
   @Column({ nullable: true })

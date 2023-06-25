@@ -12,7 +12,7 @@ import { SigninDto } from './dtos/signIn.dto';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 import { Roles } from 'src/decorators/roldes.decorator';
-import { Role } from 'src/enums/enums.enum';
+import { Role } from 'src/constants';
 import { RegisterAdminDto } from './dtos/registerAdmin.dto';
 import { Response } from 'express';
 import * as speakeasy from 'speakeasy';

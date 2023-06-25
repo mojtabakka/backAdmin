@@ -1,21 +1,12 @@
 import {
-  Column,
   CreateDateColumn,
-  Entity,
-  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './User';
-import { AbstractEntity } from './common/Abstract';
 
-@Entity()
-export class UserPhoto extends AbstractEntity {
-  @Column()
-  src: string;
-
-  @ManyToOne(() => User, (user) => user.photos)
-  user: User;
+export abstract class AbstractEntity {
+  @PrimaryGeneratedColumn()
+  public id: number;
 
   @CreateDateColumn({
     type: 'timestamp',

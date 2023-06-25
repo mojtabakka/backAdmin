@@ -9,12 +9,10 @@ import {
 } from 'typeorm';
 import { PropertyTitles } from './PropertyTitles';
 import { Product } from './Product';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class Properties {
-  @PrimaryGeneratedColumn()
-  id: number;
-
+export class Properties extends AbstractEntity {
   @Column({ nullable: true })
   title: string;
 
@@ -25,7 +23,7 @@ export class Properties {
   propertyTitle: PropertyTitles;
 
   @ManyToMany(() => Product)
-  products: Product[]
+  products: Product[];
 
   @CreateDateColumn({
     type: 'timestamp',

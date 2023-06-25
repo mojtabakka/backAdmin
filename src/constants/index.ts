@@ -14,3 +14,8 @@ export enum orderStatus {
   IsSendig = 'isSending',
   Completed = 'completed',
 }
+
+export enum Order {
+  ASC = "ASC",
+  DESC = "DESC",
+}

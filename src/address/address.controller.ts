@@ -9,7 +9,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/roldes.decorator';
-import { Role } from 'src/enums/enums.enum';
+import { Role } from 'src/constants';
 import { AddressService } from './address.service';
 import { createAddressDto } from './dtos/createAddress.dto';
 

@@ -11,14 +11,13 @@ import {
 } from 'typeorm';
 import { UserPublic } from './UserPublic';
 import { Product } from './Product';
-import { orderStatus } from 'src/enums/enums.enum';
+import { orderStatus } from 'src/constants';
 import { Basket } from './‌Basket';
 import { Address } from './Address';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class Orders {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class Orders extends AbstractEntity {
   @Column({ nullable: true, default: orderStatus.NotPayed })
   status: string;
 

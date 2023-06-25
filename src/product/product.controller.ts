@@ -17,12 +17,13 @@ import { ProductService } from './product.service';
 import { Response, Request } from 'express';
 import { CreateProductDto } from './dtos/createProduct.dto';
 import { Roles } from 'src/decorators/roldes.decorator';
-import { Role } from 'src/enums/enums.enum';
+import { Role } from 'src/constants';
 import { EditProductDto } from './dtos/editProduct.dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { Product } from 'src/typeorm/entities/Product';
+import { PageOptionsDto } from 'src/dtos';
 
 @Controller('product')
 export class ProductController {
@@ -74,11 +75,14 @@ export class ProductController {
 
   @Get()
   @Public()
-  async getProducts(@Res() res: Response, @Req() req) {
-    const data = await this.productService.getProducts();
+  async getProducts(
+    @Query() pageOptionsDto: PageOptionsDto,
+    @Res() res: Response,
+  ) {
+    const data = await this.productService.getProducts(pageOptionsDto);
     res.status(HttpStatus.OK).json({
       message: 'products recieved successfully',
-      data,
+      ...data
     });
   }
 

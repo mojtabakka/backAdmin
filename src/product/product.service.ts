@@ -6,11 +6,14 @@ import { CreateProduct } from './utils/createProduct';
 import { UsersService } from 'src/users/users.service';
 import { EditProduct } from './utils/types';
 import { ProductPhoto } from 'src/typeorm/entities/ProductPhoto';
-import { ProductStatuses } from 'src/enums/enums.enum';
+import { ProductStatuses } from 'src/constants';
 import {
   getWordsonPersiankyboard,
   isEmptyArray,
 } from 'src/common/utils/functions.utils';
+import { PageDto } from 'src/dtos/page.dto';
+import { User } from 'src/typeorm/entities/User';
+import { PageMetaDto, PageOptionsDto } from 'src/dtos';
 @Injectable()
 export class ProductService {
   constructor(
@@ -62,14 +65,20 @@ export class ProductService {
     return this.productPhotoRepository.save(photoUrl);
   }
 
-  async getProducts() {
-    const products = await this.productRepository
+  async getProducts(pageOptionsDto: PageOptionsDto): Promise<PageDto<Product>> {
+    const queryBuilder = await this.productRepository
       .createQueryBuilder('product')
       .groupBy('product.model')
-      .select('*')
-      .addSelect(['COUNT(product.id) as numberOfExist'])
-      .getRawMany();
-    return products;
+      .addSelect(' COUNT(*) OVER() ', 'ctn')
+      .orderBy('product.created_at', pageOptionsDto.order)
+      .offset(pageOptionsDto.skip)
+      .limit(pageOptionsDto.take);
+    console.log(await queryBuilder.getRawMany());
+
+    const itemCount = (await queryBuilder.getRawMany())[0].ctn;
+    const { entities } = await queryBuilder.getRawAndEntities();
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    return new PageDto(entities, pageMetaDto);
   }
 
   async getProductsForPublic(items): Promise<Product[] | undefined> {
@@ -217,11 +226,12 @@ export class ProductService {
     const updateProduct = await this.productRepository
       .createQueryBuilder('product')
       .where(
-        'product.model LIKE :searchItem OR product.priceForUser LIKE :searchItem  or product.features  LIKE :searchItem ',
+        'product.model LIKE :searchItem OR product.priceForUser LIKE :searchItem ',
         {
           searchItem: `%${searchItem}%`,
         },
       )
+      .groupBy('product.model')
       .getMany();
     return updateProduct;
   }

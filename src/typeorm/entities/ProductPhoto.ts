@@ -8,9 +8,10 @@ import {
   JoinTable,
 } from 'typeorm';
 import { Product } from './Product';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class ProductPhoto {
+export class ProductPhoto extends AbstractEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -20,17 +21,4 @@ export class ProductPhoto {
   @ManyToMany(() => Product, (product) => product.photos)
   @JoinTable()
   products: Product[];
-
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
-  public created_at: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  public updated_at: Date;
 }

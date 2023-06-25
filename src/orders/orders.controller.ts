@@ -12,7 +12,7 @@ import {
   Res,
 } from '@nestjs/common';
 import { Roles } from 'src/decorators/roldes.decorator';
-import { Role } from 'src/enums/enums.enum';
+import { Role } from 'src/constants';
 import { OrdersService } from './orders.service';
 import { SearchOrderDto } from './dtos/serchOrder.dto';
 

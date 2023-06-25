@@ -15,7 +15,7 @@ import { CreateUserDto } from './dtos/createUser.dto';
 import { User } from 'src/typeorm/entities/User';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { Roles } from 'src/decorators/roldes.decorator';
-import { Role } from 'src/enums/enums.enum';
+import { Role } from 'src/constants';
 import { Response } from 'express';
 import { editPublicUser } from './dtos/editPublicUser.dto';
 
