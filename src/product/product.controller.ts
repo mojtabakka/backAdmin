@@ -82,17 +82,24 @@ export class ProductController {
     const data = await this.productService.getProducts(pageOptionsDto);
     res.status(HttpStatus.OK).json({
       message: 'products recieved successfully',
-      ...data
+      ...data,
     });
   }
 
   @Get('public')
   @Public()
-  async getProductsPublic(@Query() query, @Res() res: Response) {
-    const data = await this.productService.getProductsForPublic(query);
+  async getProductsPublic(
+    @Query() query,
+    @Query() pageOptionsDto: PageOptionsDto,
+    @Res() res: Response,
+  ) {
+    const data = await this.productService.getProductsForPublic(
+      query,
+      pageOptionsDto,
+    );
     res.status(HttpStatus.OK).json({
       message: 'products recieved successfully',
-      data,
+      ...data,
     });
   }
 

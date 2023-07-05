@@ -13,7 +13,7 @@ import { AbstractEntity } from './common/Abstract';
 
 @Entity()
 export class PropertyTitles extends AbstractEntity {
-  @Column({ unique: true })
+  @Column({ unique: true ,charset:'utf8'})
   title: string;
 
   @ManyToOne(() => Category, (user) => user.propertyTitles)

@@ -6,4 +6,7 @@ export class CreateAddress {
   city: string;
   postalCode: string;
   address: string;
+  receivername: string;
+  receiverlastname: string;
+  recivermobile: string;
 }

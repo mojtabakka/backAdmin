@@ -83,7 +83,7 @@ export class AuthGuard implements CanActivate {
         const payload = await this.jwtService.verifyAsync(token, {
           secret: jwtConstants.secret,
         });
-        const userRolsesObj = (await this.userService.findOne(payload.username))
+        const userRolsesObj = (await this.userService.findOne(payload.phoneNumber))
           .roles;
 
         const userRolses = this.getUserRoles(userRolsesObj);

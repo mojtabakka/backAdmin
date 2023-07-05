@@ -31,9 +31,11 @@ import { Brands } from './typeorm/entities/Brands';
 import { Category } from './typeorm/entities/Category';
 import { PropertyTitles } from './typeorm/entities/PropertyTitles';
 import { Properties } from './typeorm/entities/Properties';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),
@@ -47,7 +49,7 @@ import { Properties } from './typeorm/entities/Properties';
       port: 3306,
       username: 'root',
       password: '0019058101Aa@',
-      database: 'test',
+      database: 'shop',
       entities: [
         User,
         Role,

@@ -2,20 +2,21 @@ export type userOfPayload = {
   username: string;
 };
 
-export type CreateProduct = {
+export type CreateProductDetial = {
+  brands;
+  categories;
   deliveryMethod: string;
-  numberOfExist: string;
-  warranty: string;
+  exist: boolean;
   model: string;
+  numberOfExist: number;
+  off: number;
+  photo: string;
   price: string;
-  features: string;
   priceForUser: string;
   priceForWorkmate: string;
-  exist: boolean;
-  off: number;
-  categories;
-  brands;
+  properties;
   types;
+  warranty: string;
 };
 
 export type EditProduct = {

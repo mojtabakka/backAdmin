@@ -14,10 +14,10 @@ import { AbstractEntity } from './common/Abstract';
 
 @Entity()
 export class Brands extends AbstractEntity {
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   brand: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   title: string;
 
   @ManyToMany(() => Category, (category) => category.brands)

@@ -1,10 +1,7 @@
 import {
   Entity,
   Column,
-  PrimaryGeneratedColumn,
   ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
   ManyToMany,
   JoinTable,
   PrimaryColumn,
@@ -17,20 +14,18 @@ import { Brands } from './Brands';
 import { Category } from './Category';
 import { ProductTypes } from './ProductTypes';
 import { Properties } from './Properties';
+import { AbstractEntity } from './common/Abstract';
 
 @Entity()
-export class Product {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ nullable: true })
+export class Product extends AbstractEntity {
+  @Column({ nullable: true, charset: 'utf8' })
   @IsEmpty()
   deliveryMethod: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true,charset:'utf8' })
   warranty: string;
 
-  @PrimaryColumn({ nullable: false })
+  @PrimaryColumn({ nullable: false,charset:'utf8' })
   model: string;
 
   @Column({ nullable: true })
@@ -78,17 +73,4 @@ export class Product {
 
   @ManyToMany(() => Basket, (basket) => basket.products)
   baskets: Basket[];
-
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
-  public created_at: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  public updated_at: Date;
 }

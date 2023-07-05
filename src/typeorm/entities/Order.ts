@@ -21,7 +21,7 @@ export class Orders extends AbstractEntity {
   @Column({ nullable: true, default: orderStatus.NotPayed })
   status: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   value: string;
 
   @Column({ nullable: true })
@@ -44,17 +44,4 @@ export class Orders extends AbstractEntity {
 
   @ManyToOne(() => Address, (address) => address.orders)
   address: Address;
-
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
-  public created_at: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  public updated_at: Date;
 }

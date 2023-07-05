@@ -11,6 +11,7 @@ import { Basket } from 'src/typeorm/entities/‌Basket';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { searchOrder } from './utils/types/searchOrder';
+import { PageDto, PageMetaDto, PageOptionsDto } from 'src/dtos';
 
 @Injectable()
 export class OrdersService {
@@ -272,7 +273,8 @@ export class OrdersService {
 
   async searchOrder(
     searchOrderDetail: searchOrder,
-  ): Promise<Orders[] | undefined> {
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Orders>> {
     const {
       name,
       lastName,
@@ -283,7 +285,7 @@ export class OrdersService {
       city,
       status,
     } = searchOrderDetail;
-    let result = this.ordersRepository
+    let queryBuilder = this.ordersRepository
       .createQueryBuilder('orders')
       .leftJoinAndSelect('orders.address', 'address')
       .leftJoinAndSelect('orders.cart', 'cart')
@@ -291,45 +293,53 @@ export class OrdersService {
       .leftJoinAndSelect('orders.user', 'user')
       .leftJoinAndSelect('products.photos', 'photos');
     if (name) {
-      result = result.where('user.name LIKE :name ', { name: `%${name}%` });
+      queryBuilder.where('user.name LIKE :name ', { name: `%${name}%` });
     }
     if (lastName) {
-      result = result.andWhere('user.lastName LIKE :lastName ', {
+      queryBuilder.andWhere('user.lastName LIKE :lastName ', {
         lastName: `%${lastName}%`,
       });
     }
     if (phoneNumber) {
-      result = result.andWhere('user.phoneNumber LIKE :phoneNumber ', {
+      queryBuilder.andWhere('user.phoneNumber LIKE :phoneNumber ', {
         phoneNumber: `%${phoneNumber}%`,
       });
     }
     if (nationalCode) {
-      result = result.andWhere('user.nationalCode LIKE :nationalCode ', {
+      queryBuilder.andWhere('user.nationalCode LIKE :nationalCode ', {
         nationalCode: `%${nationalCode}%`,
       });
     }
     if (model) {
-      result = result.andWhere('products.model LIKE :model ', {
+      queryBuilder.andWhere('products.model LIKE :model ', {
         model: `%${model}%`,
       });
     }
     if (state) {
-      result = result.andWhere('address.state LIKE  :state ', {
+      queryBuilder.andWhere('address.state LIKE  :state ', {
         state: `%${state}%`,
       });
     }
     if (city) {
-      result = result.andWhere('address.city LIKE :city ', {
+      queryBuilder.andWhere('address.city LIKE :city ', {
         city: `%${city}%`,
       });
     }
 
     if (status) {
-      result = result.andWhere('orders.status=:status ', {
+      queryBuilder.andWhere('orders.status=:status ', {
         status,
       });
     }
 
-    return result.getMany();
+    queryBuilder
+      .orderBy('orders.created_at', pageOptionsDto.order)
+      .offset(pageOptionsDto.skip)
+      .limit(pageOptionsDto.take);
+
+    const itemCount = await queryBuilder.getCount();
+    const { entities } = await queryBuilder.getRawAndEntities();
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    return new PageDto(entities, pageMetaDto);
   }
 }

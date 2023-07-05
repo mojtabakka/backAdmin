@@ -23,13 +23,13 @@ export class Address extends AbstractEntity {
   @Column({ nullable: true })
   unit: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   state: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   district: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   city: string;
 
   @Column({ nullable: true })
@@ -43,6 +43,15 @@ export class Address extends AbstractEntity {
 
   @Column({ nullable: false, default: true })
   active: boolean;
+
+  @Column({ nullable: false })
+  receivername: string;
+
+  @Column({ nullable: false, charset: 'utf8' })
+  receiverlastname: string;
+
+  @Column({ nullable: false, charset: 'utf8' })
+  recivermobile: string;
 
   @Column({ nullable: false })
   address: string;

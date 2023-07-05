@@ -15,16 +15,13 @@ import { AbstractEntity } from './common/Abstract';
 
 @Entity()
 export class UserPublic extends AbstractEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
-
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   username: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   lastName: string;
 
   @Column({ nullable: true })

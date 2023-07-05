@@ -13,10 +13,10 @@ import { AbstractEntity } from './common/Abstract';
 
 @Entity()
 export class Properties extends AbstractEntity {
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   title: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   property: string;
 
   @ManyToOne(() => PropertyTitles, (pt) => pt.properties)

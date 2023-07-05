@@ -12,10 +12,10 @@ import { AbstractEntity } from './common/Abstract';
 
 @Entity()
 export class ProductTypes extends AbstractEntity {
-  @Column({ unique: true })
+  @Column({ unique: true, charset: 'utf8' })
   type: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   title: string;
 
   @ManyToMany(() => Category, (category) => category.productTypes)

@@ -34,20 +34,19 @@ export class AuthService {
     return false;
   }
 
-  async signIn(username: string, pass: string) {
+  async signIn(phoneNumber: string, pass: string) {
     let passwordValid: boolean;
-
-    const user = await this.usersService.findOne(username);
+    const user = await this.usersService.findOne(phoneNumber);
     if (user) {
       passwordValid = await bcrypt.compare(pass, user.password);
     }
     if (!user || !passwordValid) {
       throw new HttpException(
-        'username or password is invalid',
+        'رمز عبور یا نام کاربری اشتباه است',
         HttpStatus.UNAUTHORIZED,
       );
     }
-    const payload = { username: user.username, sub: user.id };
+    const payload = { phoneNumber: user.phoneNumber, sub: user.id };
     const token = await this.jwtService.signAsync(payload);
     return {
       token,
@@ -58,6 +57,28 @@ export class AuthService {
   }
 
   async registerAdmin(registerAdminDetail: RegisterAdmin) {
+    const checkUserBuynationalCode = await this.usersService.findOneByObject({
+      nationalCode: registerAdminDetail.nationalCode,
+    });
+
+    if (checkUserBuynationalCode) {
+      throw new HttpException(
+        `کاربر با کدملی ${registerAdminDetail.nationalCode} در سامانه ثبت نام شده است`,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const checkUserBuyPhounNumber = await this.usersService.findOneByObject({
+      phoneNumber: registerAdminDetail.phoneNumber,
+    });
+
+    if (checkUserBuyPhounNumber) {
+      throw new HttpException(
+        `کاربر با شماره تماس  ${registerAdminDetail.phoneNumber } در سامانه ثبت نام شده است`,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
     const saltOrRounds = 10;
     const hashedPassword = await bcrypt.hash(
       registerAdminDetail.password,

@@ -21,13 +21,19 @@ export class UsersService {
     private userPublicRepository: Repository<UserPublic>,
   ) {}
 
-  async findOne(username: string): Promise<User | undefined> {
+  async findOne(phoneNumber: string): Promise<User | undefined> {
     return this.usersRepository.findOne({
-      where: { username: username },
+      where: { phoneNumber },
       relations: ['roles'],
     });
   }
 
+  async findOneByObject(obj: object): Promise<User | undefined> {
+    return this.usersRepository.findOne({
+      where: { ...obj },
+      relations: ['roles'],
+    });
+  }
   async findOnePublic(phoneNumber: string): Promise<UserPublic | undefined> {
     return this.userPublicRepository.findOneBy({});
   }

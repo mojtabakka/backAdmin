@@ -6,6 +6,11 @@ import { ProductTypes } from 'src/typeorm/entities/ProductTypes';
 import { Properties } from 'src/typeorm/entities/Properties';
 import { PropertyTitles } from 'src/typeorm/entities/PropertyTitles';
 import { Repository } from 'typeorm';
+import {
+  CreateBrandDetail,
+  CreateTypeDetail,
+  createCatDetail,
+} from './utils/types';
 
 @Injectable()
 export class TypeService {
@@ -26,17 +31,18 @@ export class TypeService {
     private propertyTitlesRepository: Repository<PropertyTitles>,
   ) {}
 
-  async createProductType(type: {
-    type: string;
-    title: string;
-  }): Promise<ProductTypes | undefined> {
+  async createProductType(
+    createTypeDetail: CreateTypeDetail,
+  ): Promise<ProductTypes | undefined> {
     let result;
-    const searchProductType = await this.findProductTypeByType(type.type);
+    const searchProductType = await this.findProductTypeByType(
+      createTypeDetail.type,
+    );
     if (!searchProductType) {
-      const productType = this.productTypesRepository.create(type);
+      const productType = this.productTypesRepository.create(createTypeDetail);
       result = await this.productTypesRepository.save(productType);
     } else {
-      searchProductType.type = type.type;
+      searchProductType.type = createTypeDetail.type;
       result = await this.productTypesRepository.save(searchProductType);
     }
     return result;
@@ -46,8 +52,20 @@ export class TypeService {
     return this.productTypesRepository.find();
   }
 
-  addBrands(body: { brand: string; title: string }) {
-    const brand = this.brandsRepository.create(body);
+  addBrands(createBrandDetail: CreateBrandDetail) {
+    const findBrand = this.brandsRepository.findOneBy({
+      brand: createBrandDetail.brand,
+    });
+    const findTitle = this.brandsRepository.findOneBy({
+      title: createBrandDetail.title,
+    });
+    if (findTitle || findBrand) {
+      throw new HttpException(
+        'این برند قبلا وارد شده است',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    const brand = this.brandsRepository.create({ ...createBrandDetail });
     return this.brandsRepository.save(brand);
   }
 
@@ -55,12 +73,23 @@ export class TypeService {
     return this.brandsRepository.find();
   }
 
-  async createCat(item): Promise<Category | undefined> {
+  async createCat(
+    createCatDetail: createCatDetail,
+  ): Promise<Category | undefined> {
+    const findcat = await this.catergoryRepository.findOneBy({
+      title: createCatDetail?.type.trim(),
+    });
+    if (findcat) {
+      throw new HttpException(
+        `دسته ${createCatDetail.type} قبلا وارد شده است`,
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
     const cat = this.catergoryRepository.create({
-      title: item.type,
-      brands: item.brands,
-      productTypes: item.types,
-      propertyTitles: item.properties,
+      title: createCatDetail.type,
+      brands: createCatDetail.brands,
+      // productTypes: createCatDetail.types,
+      // propertyTitles: createCatDetail.properties,
     });
     return this.catergoryRepository.save(cat);
   }
@@ -74,15 +103,13 @@ export class TypeService {
   }
 
   async getCat(id: number): Promise<Category | undefined> {
-    console.log(id);
-
     let cats = await this.catergoryRepository
       .createQueryBuilder('category')
       .leftJoinAndSelect('category.brands', 'brands')
       .leftJoinAndSelect('category.productTypes', 'productTypes')
       .leftJoinAndSelect('category.propertyTitles', 'propertyTitles')
       .leftJoinAndSelect('propertyTitles.properties', 'properties')
-      .where('category.id=:id', { id:7 })
+      .where('category.id=:id', { id: 7 })
       .getOne();
 
     return cats;

@@ -13,25 +13,25 @@ import { AbstractEntity } from './common/Abstract';
 
 @Entity()
 export class User extends AbstractEntity {
-  @Column()
+  @Column({ nullable: true,charset:'utf8' })
   username: string;
 
-  @Column()
+  @Column({ nullable: true,charset:'utf8' })
   name: string;
 
-  @Column()
+  @Column({ nullable: true,charset:'utf8' })
   lastName: string;
 
-  @Column()
+  @Column({ nullable: true })
   nationalCode: string;
 
-  @Column()
+  @Column({ nullable: true })
   email: string;
 
-  @Column()
+  @Column({ nullable: true,charset:'utf8' })
   phoneNumber: string;
 
-  @Column()
+  @Column({ nullable: true })
   password: string;
 
   @OneToMany(() => UserPhoto, (userPhoto) => userPhoto.user)

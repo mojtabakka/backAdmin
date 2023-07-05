@@ -15,6 +15,7 @@ import { Roles } from 'src/decorators/roldes.decorator';
 import { Role } from 'src/constants';
 import { OrdersService } from './orders.service';
 import { SearchOrderDto } from './dtos/serchOrder.dto';
+import { PageOptionsDto } from 'src/dtos';
 
 @Controller('orders')
 export class OrdersController {
@@ -120,9 +121,8 @@ export class OrdersController {
   }
 
   @Roles(Role.User)
-  @Get(':id')
+  @Get('get-order/:id')
   async getOrder(@Param('id') id: number, @Res() res) {
-
     const data = await this.orderService.getOrder(id);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
@@ -146,16 +146,19 @@ export class OrdersController {
   }
 
   @Roles(Role.Admin)
-  @Post('search-order-admin')
+  @Get('search-order-admin')
   async searchProductsAdmin(
-    @Body() searchOrderDto: SearchOrderDto,
-    @Req() req,
+    @Query() pageOptionsDto: PageOptionsDto,
+    @Query() searchOrderDto: SearchOrderDto,
     @Res() res,
   ) {
-    const data = await this.orderService.searchOrder(searchOrderDto);
+    const data = await this.orderService.searchOrder(
+      searchOrderDto,
+      pageOptionsDto,
+    );
     res.status(HttpStatus.OK).json({
       message: 'successfully',
-      data,
+      ...data,
     });
   }
 }

@@ -2,9 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/typeorm/entities/Product';
 import { Repository } from 'typeorm';
-import { CreateProduct } from './utils/createProduct';
 import { UsersService } from 'src/users/users.service';
-import { EditProduct } from './utils/types';
+import { CreateProductDetial, EditProduct } from './utils/types';
 import { ProductPhoto } from 'src/typeorm/entities/ProductPhoto';
 import { ProductStatuses } from 'src/constants';
 import {
@@ -25,7 +24,7 @@ export class ProductService {
   ) {}
 
   async createProduct(
-    detailCreateProduct: CreateProduct,
+    detailCreateProduct: CreateProductDetial,
     numberOfExist: number,
 
     username: string,
@@ -73,33 +72,39 @@ export class ProductService {
       .orderBy('product.created_at', pageOptionsDto.order)
       .offset(pageOptionsDto.skip)
       .limit(pageOptionsDto.take);
-    console.log(await queryBuilder.getRawMany());
 
-    const itemCount = (await queryBuilder.getRawMany())[0].ctn;
+    const itemCount = (await queryBuilder.getRawMany())[0]?.ctn;
     const { entities } = await queryBuilder.getRawAndEntities();
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
     return new PageDto(entities, pageMetaDto);
   }
 
-  async getProductsForPublic(items): Promise<Product[] | undefined> {
+  async getProductsForPublic(
+    items,
+    pageOptionsDto: PageOptionsDto,
+  ): Promise<PageDto<Product>> {
     const properties = items.properties;
-    let products = this.productRepository
+    const queryBuilder = this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.photos', 'photos');
     if (properties) {
       const filter = !isEmptyArray(properties) ? properties : [properties];
 
-      products = products
+      queryBuilder
         .leftJoinAndSelect('product.properties', 'properties')
         .where('properties.id IN(:...ids) ', { ids: filter });
     }
-    products = products
+    queryBuilder
       .groupBy('product.model')
-      .select('*')
+      .addSelect(' COUNT(*) OVER() ', 'ctn')
+      .orderBy('product.created_at', pageOptionsDto.order)
+      .offset(pageOptionsDto.skip)
+      .limit(pageOptionsDto.take);
 
-      .addSelect(['COUNT(product.id) as numberOfExist']);
-
-    return products.getRawMany();
+    const itemCount = (await queryBuilder.getRawMany())[0].ctn;
+    const { entities } = await queryBuilder.getRawAndEntities();
+    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    return new PageDto(entities, pageMetaDto);
   }
 
   async getProductForPublic(model: string): Promise<Product | undefined> {
@@ -138,7 +143,6 @@ export class ProductService {
     delete detailEditProduct.categories;
     delete detailEditProduct.properties;
     detailEditProduct.off = Number(detailEditProduct.off);
-    detailEditProduct.features = JSON.stringify(detailEditProduct.features);
     const updateProduct = await this.productRepository
       .createQueryBuilder('product')
       .update(Product)

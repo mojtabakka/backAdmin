@@ -19,7 +19,7 @@ import * as speakeasy from 'speakeasy';
 import { generate } from 'otp-generator';
 import { AddMinutesToDate } from 'src/common/utils/functions.utils';
 import { UsersService } from 'src/users/users.service';
-import { CreateUserPublicDto } from './dtos/CreateUserPublic.dto';
+import { CreateUserPublicDto } from './dtos/createUserPublic.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -32,7 +32,7 @@ export class AuthController {
   @Public()
   async login(@Body() signInDto: SigninDto, @Res() res: Response) {
     const data = await this.authService.signIn(
-      signInDto.username,
+      signInDto.phoneNumber,
       signInDto.password,
     );
     res.status(HttpStatus.OK).json({

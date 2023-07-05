@@ -1,21 +1,5 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
-  OneToMany,
-  OneToOne,
-  JoinColumn,
-  ManyToMany,
-  JoinTable,
-} from 'typeorm';
-import { UserPublic } from './UserPublic';
+import { Entity, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { Product } from './Product';
-import { orderStatus } from 'src/constants';
-import { Basket } from './‌Basket';
-import { Address } from './Address';
 import { ProductTypes } from './ProductTypes';
 import { Brands } from './Brands';
 import { PropertyTitles } from './PropertyTitles';
@@ -23,7 +7,7 @@ import { AbstractEntity } from './common/Abstract';
 
 @Entity()
 export class Category extends AbstractEntity {
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   title: string;
 
   @ManyToMany(() => ProductTypes, (type) => type.categories)

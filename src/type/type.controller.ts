@@ -11,6 +11,9 @@ import {
 import { Roles } from 'src/decorators/roldes.decorator';
 import { Role } from 'src/constants';
 import { TypeService } from './type.service';
+import { CreateCatDto } from './dtos/createCat.dto';
+import { CreateBrandDto } from './dtos/createBrand.dto';
+import { CreateTypeDto } from './dtos/createType.dto';
 
 @Controller('type')
 export class TypeController {
@@ -18,10 +21,10 @@ export class TypeController {
   @Post()
   @Roles(Role.Admin)
   async CreateProduct(
-    @Body() body: { type: string; title: string },
+    @Body() createTypeDto:CreateTypeDto ,
     @Res() res,
   ) {
-    const data = await this.typeService.createProductType(body);
+    const data = await this.typeService.createProductType(createTypeDto);
     res.status(HttpStatus.OK).json({
       data,
     });
@@ -38,8 +41,8 @@ export class TypeController {
 
   @Post('add-brand')
   @Roles(Role.Admin)
-  async addBrands(@Body() body: { brand: string; title: string }, @Res() res) {
-    const data = await this.typeService.addBrands(body);
+  async addBrands(@Body() CreateBrandDto: CreateBrandDto, @Res() res) {
+    const data = await this.typeService.addBrands(CreateBrandDto);
     res.status(HttpStatus.OK).json({
       data,
     });
@@ -57,8 +60,8 @@ export class TypeController {
 
   @Post('cat')
   @Roles(Role.Admin)
-  async createCat(@Body() body, @Res() res) {
-    const data = await this.typeService.createCat(body);
+  async createCat(@Body() createDto: CreateCatDto, @Res() res) {
+    const data = await this.typeService.createCat(createDto);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
       data,
