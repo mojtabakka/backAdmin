@@ -123,23 +123,23 @@ export class ProductController {
     });
   }
 
-  @Delete(':id')
+  @Delete(':model')
   @Roles(Role.Admin)
-  async deleteProduct(@Param('id') id: number, @Res() res: Response) {
-    await this.productService.deleteProduct(id);
+  async deleteProduct(@Param('model') model: string, @Res() res: Response) {
+    await this.productService.deleteProduct(model);
     res.status(HttpStatus.OK).json({
       message: 'Product Deleted Successfully',
     });
   }
 
-  @Put(':id')
+  @Put(':model')
   @Roles(Role.Admin)
   async editProduct(
-    @Param('id') id: number,
+    @Param('model') model: string,
     @Body() editProductDto: EditProductDto,
     @Res() res: Response,
   ) {
-    const data = await this.productService.editProduct(id, editProductDto);
+    const data = await this.productService.editProduct(model, editProductDto);
     res.status(HttpStatus.OK).json({
       message: 'Product Updated successfully',
       data,

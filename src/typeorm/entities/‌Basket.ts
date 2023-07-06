@@ -39,7 +39,7 @@ export class Basket extends AbstractEntity {
   @JoinColumn()
   user: UserPublic;
 
-  @ManyToMany(() => Product, (product) => product.baskets)
+  @ManyToMany(() => Product, (product) => product.baskets, { cascade: true })
   @JoinTable()
   products: Product[];
 

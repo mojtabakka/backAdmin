@@ -5,6 +5,7 @@ import {
   ManyToMany,
   JoinTable,
   PrimaryColumn,
+  JoinColumn,
 } from 'typeorm';
 import { User } from './User';
 import { IsEmpty } from 'class-validator';
@@ -22,18 +23,11 @@ export class Product extends AbstractEntity {
   @IsEmpty()
   deliveryMethod: string;
 
-  @Column({ nullable: true,charset:'utf8' })
+  @Column({ nullable: true, charset: 'utf8' })
   warranty: string;
 
-  @PrimaryColumn({ nullable: false,charset:'utf8' })
+  @Column({ nullable: false, charset: 'utf8' })
   model: string;
-
-  @Column({ nullable: true })
-  price: string;
-
-  @ManyToMany(() => Properties)
-  @JoinTable()
-  properties: Properties[];
 
   @Column({ nullable: true })
   priceForUser: string;
@@ -53,24 +47,58 @@ export class Product extends AbstractEntity {
   @Column({ nullable: true })
   shippingCost: string;
 
-  @ManyToMany(() => Brands, (brand) => brand.products)
-  @JoinTable()
-  brands: Brands[];
+  @ManyToOne(() => Brands, (brand) => brand.products, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  brand: Brands;
 
-  @ManyToMany(() => Category, (category) => category.products)
+  @ManyToMany(() => Properties, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    eager: true,
+  })
   @JoinTable()
-  categories: Category[];
+  properties: Properties[];
 
-  @ManyToMany(() => ProductTypes, (type) => type.products)
-  @JoinTable()
+  @ManyToOne(() => Category, (category) => category.products, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    eager: true,
+  })
+  category: Category;
+
+  @ManyToMany(() => ProductTypes, (type) => type.products, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    eager: true,
+  })
+  @JoinTable({
+    joinColumn: {
+      name: 'Product_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'producType_id',
+      referencedColumnName: 'id',
+    },
+  })
   productTypes: ProductTypes[];
 
-  @ManyToMany(() => ProductPhoto, (ProductPhoto) => ProductPhoto.products)
+  @ManyToMany(() => ProductPhoto, (ProductPhoto) => ProductPhoto.products, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    eager: true,
+  })
   photos: ProductPhoto[];
 
-  @ManyToOne(() => User, (user) => user.product)
+  @ManyToOne(() => User, (user) => user.product, { eager: true })
   author: User;
 
-  @ManyToMany(() => Basket, (basket) => basket.products)
+  @ManyToMany(() => Basket, (basket) => basket.products, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+    eager: true,
+  })
   baskets: Basket[];
 }

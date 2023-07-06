@@ -3,8 +3,8 @@ export type userOfPayload = {
 };
 
 export type CreateProductDetial = {
-  brands;
-  categories;
+  brand;
+  category;
   deliveryMethod: string;
   exist: boolean;
   model: string;
@@ -26,13 +26,12 @@ export type EditProduct = {
   warranty: string;
   model: string;
   price: string;
-  features: string;
   priceForUser: string;
   priceForWorkmate: string;
   exist: boolean;
   off: number;
-  categories;
-  brands;
+  category;
+  brand;
   types;
   properties;
 };

@@ -18,9 +18,11 @@ export class Category extends AbstractEntity {
   @JoinTable()
   brands: Brands[];
 
-  @ManyToMany(() => Product, (product) => product.categories)
+  @OneToMany(() => Product, (product) => product.category)
   products: Product[];
 
-  @OneToMany(() => PropertyTitles, (title) => title.category)
+  @OneToMany(() => PropertyTitles, (title) => title.category, {
+    cascade: true,
+  })
   propertyTitles: PropertyTitles[];
 }

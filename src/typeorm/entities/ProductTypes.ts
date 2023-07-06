@@ -1,11 +1,4 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToMany,
-} from 'typeorm';
+import { Entity, Column, ManyToMany, JoinColumn } from 'typeorm';
 import { Category } from './Category';
 import { Product } from './Product';
 import { AbstractEntity } from './common/Abstract';
@@ -21,6 +14,11 @@ export class ProductTypes extends AbstractEntity {
   @ManyToMany(() => Category, (category) => category.productTypes)
   categories: Category[];
 
-  @ManyToMany(() => Product, (product) => product.productTypes)
+  @ManyToMany(() => Product, (product) => product.productTypes, {
+    cascade: true,
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ referencedColumnName: 'id' })
   products: Product[];
 }

@@ -6,6 +6,8 @@ import {
   UpdateDateColumn,
   ManyToMany,
   JoinTable,
+  OneToMany,
+  JoinColumn,
 } from 'typeorm';
 import { ProductTypes } from './ProductTypes';
 import { Category } from './Category';
@@ -23,6 +25,7 @@ export class Brands extends AbstractEntity {
   @ManyToMany(() => Category, (category) => category.brands)
   categories: Category[];
 
-  @ManyToMany(() => Product, (product) => product.brands)
+  @OneToMany(() => Product, (product) => product.brand, { cascade: true })
+  @JoinColumn({ referencedColumnName: 'id' })
   products: Product[];
 }

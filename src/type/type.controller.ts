@@ -20,10 +20,7 @@ export class TypeController {
   constructor(private typeService: TypeService) {}
   @Post()
   @Roles(Role.Admin)
-  async CreateProduct(
-    @Body() createTypeDto:CreateTypeDto ,
-    @Res() res,
-  ) {
+  async CreateProduct(@Body() createTypeDto: CreateTypeDto, @Res() res) {
     const data = await this.typeService.createProductType(createTypeDto);
     res.status(HttpStatus.OK).json({
       data,

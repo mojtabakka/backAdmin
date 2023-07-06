@@ -52,11 +52,12 @@ export class TypeService {
     return this.productTypesRepository.find();
   }
 
-  addBrands(createBrandDetail: CreateBrandDetail) {
-    const findBrand = this.brandsRepository.findOneBy({
+  async addBrands(createBrandDetail: CreateBrandDetail) {
+    const findBrand = await this.brandsRepository.findOneBy({
       brand: createBrandDetail.brand,
     });
-    const findTitle = this.brandsRepository.findOneBy({
+
+    const findTitle = await this.brandsRepository.findOneBy({
       title: createBrandDetail.title,
     });
     if (findTitle || findBrand) {
@@ -88,8 +89,8 @@ export class TypeService {
     const cat = this.catergoryRepository.create({
       title: createCatDetail.type,
       brands: createCatDetail.brands,
-      // productTypes: createCatDetail.types,
-      // propertyTitles: createCatDetail.properties,
+      productTypes: createCatDetail.types,
+      propertyTitles: createCatDetail.properties,
     });
     return this.catergoryRepository.save(cat);
   }
@@ -109,7 +110,7 @@ export class TypeService {
       .leftJoinAndSelect('category.productTypes', 'productTypes')
       .leftJoinAndSelect('category.propertyTitles', 'propertyTitles')
       .leftJoinAndSelect('propertyTitles.properties', 'properties')
-      .where('category.id=:id', { id: 7 })
+      .where('category.id=:id', { id })
       .getOne();
 
     return cats;

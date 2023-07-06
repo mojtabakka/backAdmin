@@ -26,11 +26,20 @@ export class ProductService {
   async createProduct(
     detailCreateProduct: CreateProductDetial,
     numberOfExist: number,
-
     username: string,
   ): Promise<Product[] | undefined> {
-    const products: Product[] = [];
+    const findProduct = await this.productRepository.findOneBy({
+      model: detailCreateProduct.model.trim(),
+    });
+    if (findProduct) {
+      throw new HttpException(
+        `مدل ${detailCreateProduct.model} قبلا وارد شده است `,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
+    const products: Product[] = [];
+    const brand = detailCreateProduct.brand;
     const productPhoto: ProductPhoto[] = [];
     const photo = await this.productPhotoRepository.findOneBy({
       src: detailCreateProduct.photo,
@@ -38,20 +47,26 @@ export class ProductService {
     productPhoto.push(photo);
     const user = await this.usersService.findOne(username);
     delete detailCreateProduct.numberOfExist;
-
     for (let i: number = 0; i < Number(numberOfExist); i++) {
       products.push(
         this.productRepository.create({
           ...detailCreateProduct,
+          deliveryMethod: detailCreateProduct.deliveryMethod,
+          warranty: detailCreateProduct.warranty,
+          model: detailCreateProduct.model,
+          priceForUser: detailCreateProduct.priceForUser,
+          priceForWorkmate: detailCreateProduct.priceForWorkmate,
+          // off: detailCreateProduct.off,
+          brand: { id: brand?.id },
           author: user,
           photos: productPhoto,
-          brands: detailCreateProduct.brands,
           productTypes: detailCreateProduct.types,
-          categories: [{ id: detailCreateProduct.categories }],
+          category: { id: detailCreateProduct.category },
           properties: detailCreateProduct.properties,
         }),
       );
     }
+
     const product = await this.productRepository.save(products);
     return { ...product };
   }
@@ -121,45 +136,52 @@ export class ProductService {
     return this.productRepository.findOne({
       where: { id },
       relations: {
-        brands: true,
+        brand: true,
         productTypes: true,
-        categories: true,
+        category: true,
         properties: true,
+        photos: true,
       },
     });
   }
 
-  deleteProduct(id: number) {
-    return this.productRepository.delete(id);
+  deleteProduct(model: string) {
+    this.productRepository
+      .createQueryBuilder('product')
+      .delete()
+      .from(Product)
+      .where('model = :model', { model })
+      .execute();
   }
 
-  async editProduct(id: number, detailEditProduct: EditProduct) {
-    const brands = detailEditProduct.brands;
-    const productTypes = detailEditProduct.types;
-    const categories = detailEditProduct.categories;
-    const properties = detailEditProduct.properties;
-    delete detailEditProduct.types;
-    delete detailEditProduct.brands;
-    delete detailEditProduct.categories;
-    delete detailEditProduct.properties;
-    detailEditProduct.off = Number(detailEditProduct.off);
-    const updateProduct = await this.productRepository
-      .createQueryBuilder('product')
-      .update(Product)
-      .set({
-        ...detailEditProduct,
-      })
-      .where('id = :id', { id })
-      .execute();
-
-    const product = await this.productRepository.findOneBy({ id });
-
-    product.brands = brands;
-    product.productTypes = productTypes;
-    product.categories = categories;
-    product.properties = properties;
-    const result = this.productRepository.save(product);
-    return result;
+  async editProduct(
+    model: string,
+    detailEditProduct: EditProduct,
+  ): Promise<Product | undefined> {
+    const product = await this.productRepository.find({
+      relations: {
+        productTypes: true,
+      },
+      where: { model },
+    });
+    const updateProduct = product.map((item) => {
+      return {
+        ...item,
+        productTypes: detailEditProduct.types,
+        brand: detailEditProduct.brand,
+        deliveryMethod: detailEditProduct.deliveryMethod,
+        warranty: detailEditProduct.warranty,
+        model: detailEditProduct.model,
+        priceForUser: detailEditProduct.priceForUser,
+        priceForWorkmate: detailEditProduct.priceForWorkmate,
+        off: detailEditProduct.off,
+        category: detailEditProduct.category,
+        properties: detailEditProduct.properties,
+        // author: user,
+        // photos: productPhoto,
+      };
+    });
+    return this.productRepository.save(updateProduct)[0];
   }
 
   async getProductForReserve(model: string): Promise<Product | undefined> {

@@ -18,7 +18,7 @@ export class ProductPhoto extends AbstractEntity {
   @Column()
   src: string;
 
-  @ManyToMany(() => Product, (product) => product.photos)
+  @ManyToMany(() => Product, (product) => product.photos, { cascade: true })
   @JoinTable()
   products: Product[];
 }

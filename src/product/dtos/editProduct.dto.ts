@@ -7,13 +7,12 @@ export class EditProductDto {
   warranty: string;
   model: string;
   price: string;
-  features: string;
   priceForUser: string;
   priceForWorkmate: string;
   exist: boolean;
   off: number;
-  categories;
-  brands;
+  category;
+  brand;
   types;
   properties
 }
