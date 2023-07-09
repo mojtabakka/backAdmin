@@ -1,3 +1,5 @@
+import { type } from 'os';
+
 export type userOfPayload = {
   username: string;
 };
@@ -18,20 +20,27 @@ export type CreateProductDetial = {
   types;
   warranty: string;
 };
+export type GetProductsDetail = {
+  type: string;
+  brand: string;
+  catId: Number;
+  properties;
+};
 
 export type EditProduct = {
-  id: number;
+  brand;
+  category;
   deliveryMethod: string;
-  numberOfExist: string;
-  warranty: string;
+  exist: boolean;
+  id: number;
   model: string;
+  numberOfExist: string;
+  off: number;
+  photo: string;
   price: string;
   priceForUser: string;
   priceForWorkmate: string;
-  exist: boolean;
-  off: number;
-  category;
-  brand;
-  types;
   properties;
+  types;
+  warranty: string;
 };

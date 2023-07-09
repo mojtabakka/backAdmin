@@ -3,7 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/typeorm/entities/Product';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
-import { CreateProductDetial, EditProduct } from './utils/types';
+import {
+  CreateProductDetial,
+  EditProduct,
+  GetProductsDetail,
+} from './utils/types';
 import { ProductPhoto } from 'src/typeorm/entities/ProductPhoto';
 import { ProductStatuses } from 'src/constants';
 import {
@@ -13,6 +17,7 @@ import {
 import { PageDto } from 'src/dtos/page.dto';
 import { User } from 'src/typeorm/entities/User';
 import { PageMetaDto, PageOptionsDto } from 'src/dtos';
+import { log } from 'console';
 @Injectable()
 export class ProductService {
   constructor(
@@ -95,19 +100,37 @@ export class ProductService {
   }
 
   async getProductsForPublic(
-    items,
+    filter: GetProductsDetail,
     pageOptionsDto: PageOptionsDto,
   ): Promise<PageDto<Product>> {
-    const properties = items.properties;
+    console.log(filter);
+
+    const { catId, properties, brand, type } = filter;
     const queryBuilder = this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.photos', 'photos');
     if (properties) {
       const filter = !isEmptyArray(properties) ? properties : [properties];
-
       queryBuilder
         .leftJoinAndSelect('product.properties', 'properties')
         .where('properties.id IN(:...ids) ', { ids: filter });
+    }
+    if (brand) {
+      queryBuilder
+        .leftJoinAndSelect('product.brand', 'brand')
+        .andWhere('brand.id= :id ', { id: Number(brand) });
+    }
+
+    if (type) {
+      queryBuilder
+        .leftJoinAndSelect('product.productTypes', 'productTypes')
+        .andWhere('productTypes.id= :id ', { id: Number(type) });
+    }
+
+    if (catId) {
+      queryBuilder
+        .leftJoinAndSelect('product.category', 'category')
+        .andWhere('category.id=:catId ', { catId });
     }
     queryBuilder
       .groupBy('product.model')
@@ -116,9 +139,10 @@ export class ProductService {
       .offset(pageOptionsDto.skip)
       .limit(pageOptionsDto.take);
 
-    const itemCount = (await queryBuilder.getRawMany())[0].ctn;
+    const itemCount = (await queryBuilder.getRawMany())[0]?.ctn;
     const { entities } = await queryBuilder.getRawAndEntities();
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+
     return new PageDto(entities, pageMetaDto);
   }
 
@@ -158,12 +182,17 @@ export class ProductService {
     model: string,
     detailEditProduct: EditProduct,
   ): Promise<Product | undefined> {
+    const productPhoto: ProductPhoto[] = [];
     const product = await this.productRepository.find({
       relations: {
         productTypes: true,
       },
       where: { model },
     });
+    const photo = await this.productPhotoRepository.findOneBy({
+      src: detailEditProduct.photo,
+    });
+    productPhoto.push(photo);
     const updateProduct = product.map((item) => {
       return {
         ...item,
@@ -177,6 +206,7 @@ export class ProductService {
         off: detailEditProduct.off,
         category: detailEditProduct.category,
         properties: detailEditProduct.properties,
+        photos: productPhoto,
         // author: user,
         // photos: productPhoto,
       };

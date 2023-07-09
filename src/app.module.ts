@@ -32,6 +32,7 @@ import { Category } from './typeorm/entities/Category';
 import { PropertyTitles } from './typeorm/entities/PropertyTitles';
 import { Properties } from './typeorm/entities/Properties';
 import { ConfigModule } from '@nestjs/config';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { ConfigModule } from '@nestjs/config';
     OrdersModule,
     AddressModule,
     TypeModule,
+    CategoryModule,
   ],
   controllers: [AppController, ProductController],
   providers: [AppService, ProductService],

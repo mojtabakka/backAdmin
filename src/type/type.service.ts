@@ -21,9 +21,6 @@ export class TypeService {
     @InjectRepository(Brands)
     private brandsRepository: Repository<Brands>,
 
-    @InjectRepository(Category)
-    private catergoryRepository: Repository<Category>,
-
     @InjectRepository(Properties)
     private properitesRepository: Repository<Properties>,
 
@@ -74,47 +71,11 @@ export class TypeService {
     return this.brandsRepository.find();
   }
 
-  async createCat(
-    createCatDetail: createCatDetail,
-  ): Promise<Category | undefined> {
-    const findcat = await this.catergoryRepository.findOneBy({
-      title: createCatDetail?.type.trim(),
-    });
-    if (findcat) {
-      throw new HttpException(
-        `دسته ${createCatDetail.type} قبلا وارد شده است`,
-        HttpStatus.UNAUTHORIZED,
-      );
-    }
-    const cat = this.catergoryRepository.create({
-      title: createCatDetail.type,
-      brands: createCatDetail.brands,
-      productTypes: createCatDetail.types,
-      propertyTitles: createCatDetail.properties,
-    });
-    return this.catergoryRepository.save(cat);
-  }
-
   async findProductTypeByType(type: string) {
     return this.productTypesRepository.findOneBy({ type });
   }
 
-  getCats(): Promise<Category[] | undefined> {
-    return this.catergoryRepository.find({});
-  }
 
-  async getCat(id: number): Promise<Category | undefined> {
-    let cats = await this.catergoryRepository
-      .createQueryBuilder('category')
-      .leftJoinAndSelect('category.brands', 'brands')
-      .leftJoinAndSelect('category.productTypes', 'productTypes')
-      .leftJoinAndSelect('category.propertyTitles', 'propertyTitles')
-      .leftJoinAndSelect('propertyTitles.properties', 'properties')
-      .where('category.id=:id', { id })
-      .getOne();
-
-    return cats;
-  }
 
   async addProperty(items): Promise<PropertyTitles | undefined> {
     const check = await this.propertyTitlesRepository.findOneBy({

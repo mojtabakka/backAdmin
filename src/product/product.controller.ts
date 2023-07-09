@@ -24,6 +24,7 @@ import { diskStorage } from 'multer';
 import { Public } from 'src/auth/decorators/public.decorator';
 import { Product } from 'src/typeorm/entities/Product';
 import { PageOptionsDto } from 'src/dtos';
+import { GetProductsDto } from './dtos/getProducts.dto';
 
 @Controller('product')
 export class ProductController {
@@ -89,12 +90,12 @@ export class ProductController {
   @Get('public')
   @Public()
   async getProductsPublic(
-    @Query() query,
+    @Query() getProductsDto: GetProductsDto,
     @Query() pageOptionsDto: PageOptionsDto,
     @Res() res: Response,
   ) {
     const data = await this.productService.getProductsForPublic(
-      query,
+      getProductsDto,
       pageOptionsDto,
     );
     res.status(HttpStatus.OK).json({

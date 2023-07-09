@@ -11,7 +11,7 @@ import {
 import { Roles } from 'src/decorators/roldes.decorator';
 import { Role } from 'src/constants';
 import { TypeService } from './type.service';
-import { CreateCatDto } from './dtos/createCat.dto';
+import { CreateCatDto } from '../category/dtos/createCat.dto';
 import { CreateBrandDto } from './dtos/createBrand.dto';
 import { CreateTypeDto } from './dtos/createType.dto';
 
@@ -55,35 +55,6 @@ export class TypeController {
     });
   }
 
-  @Post('cat')
-  @Roles(Role.Admin)
-  async createCat(@Body() createDto: CreateCatDto, @Res() res) {
-    const data = await this.typeService.createCat(createDto);
-    res.status(HttpStatus.OK).json({
-      message: 'successfully',
-      data,
-    });
-  }
-
-  @Get('get-cats')
-  @Roles(Role.Admin)
-  async getcat(@Body() body, @Req() req, @Res() res) {
-    const data = await this.typeService.getCats();
-    res.status(HttpStatus.OK).json({
-      message: 'successfully',
-      data,
-    });
-  }
-
-  @Get('get-cat')
-  @Roles(Role.Admin)
-  async getCat(@Query() query, @Req() req, @Res() res) {
-    const data = await this.typeService.getCat(query.id);
-    res.status(HttpStatus.OK).json({
-      message: 'successfully',
-      data,
-    });
-  }
 
   @Post('add-property')
   @Roles(Role.Admin)
