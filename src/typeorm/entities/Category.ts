@@ -10,6 +10,9 @@ export class Category extends AbstractEntity {
   @Column({ nullable: true, charset: 'utf8' })
   title: string;
 
+  @Column({ nullable: true, charset: 'utf8' })
+  photo: string;
+
   @ManyToMany(() => ProductTypes, (type) => type.categories)
   @JoinTable()
   productTypes: ProductTypes[];

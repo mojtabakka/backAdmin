@@ -23,6 +23,7 @@ export class CategoryService {
       );
     }
     const cat = this.catergoryRepository.create({
+      photo: createCatDetail.photo,
       title: createCatDetail.type,
       brands: createCatDetail.brands,
       productTypes: createCatDetail.types,

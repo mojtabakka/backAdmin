@@ -53,8 +53,9 @@ export class OrdersService {
     productInBasket.benefit = Math.round(myBenefit);
     productInBasket.finalPrice = Math.round(mySumFinalPrice);
     productInBasket.purePrice = Math.round(mySumPrice);
-    await this.basketRepository.save(productInBasket);
-    return true;
+    const result = await this.basketRepository.save(productInBasket);
+
+    return result;
   }
 
   async getNumberOfOrder(model: string, user: any) {
@@ -66,6 +67,7 @@ export class OrdersService {
         model,
       })
       .getOne();
+
     return productInBasket && !isEmptyArray(productInBasket.products)
       ? productInBasket?.products?.length
       : 0;
@@ -138,8 +140,19 @@ export class OrdersService {
       .groupBy('products.model')
       .addSelect(['COUNT(products.id) as number'])
       .getRawMany();
-
     return basket;
+  }
+
+  async getCurrentBasketCount(id: number): Promise<Number> {
+    const basket = await this.basketRepository
+      .createQueryBuilder('basket')
+      .leftJoinAndSelect('basket.products', 'products')
+      .where('basket.userId=:id', {
+        id,
+      })
+      .getOne();
+
+    return basket.products.length;
   }
 
   async getCurrentBasketWithOutRelations(

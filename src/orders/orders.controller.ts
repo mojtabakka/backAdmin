@@ -24,10 +24,11 @@ export class OrdersController {
   @Roles(Role.User)
   @Delete('remove-prodcuct-from-basket/:model')
   async RemoveOrder(@Param('model') model: string, @Req() req, @Res() res) {
-    await this.orderService.removeOrder(model, req.user, res);
+    const data = await this.orderService.removeOrder(model, req.user, res);
+
     res.status(HttpStatus.OK).json({
       message: 'order recorded successfully',
-      data: null,
+      data,
     });
   }
 
@@ -71,9 +72,10 @@ export class OrdersController {
   @Roles(Role.User)
   @Post('addToBasket')
   async addToBasket(@Body('model') model: string, @Req() req, @Res() res) {
-    const orders = await this.orderService.addToBasket(model, req.user);
+    const data = await this.orderService.addToBasket(model, req.user);
     res.status(HttpStatus.OK).json({
       message: 'prodcut added to basket successfully',
+      data,
     });
   }
 
@@ -81,6 +83,16 @@ export class OrdersController {
   @Get('getCurrentBasket')
   async getCurrentBasket(@Req() req, @Res() res) {
     const data = await this.orderService.getCurrentBasket(req.user.sub);
+    res.status(HttpStatus.OK).json({
+      message: 'Successfully',
+      data,
+    });
+  }
+
+  @Roles(Role.User)
+  @Get('get-current-basket-count')
+  async getCurrentBasketCount(@Req() req, @Res() res) {
+    const data = await this.orderService.getCurrentBasketCount(req.user.sub);
     res.status(HttpStatus.OK).json({
       message: 'Successfully',
       data,

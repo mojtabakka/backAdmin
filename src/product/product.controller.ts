@@ -74,6 +74,8 @@ export class ProductController {
     });
   }
 
+  
+
   @Get()
   @Public()
   async getProducts(

@@ -103,8 +103,6 @@ export class ProductService {
     filter: GetProductsDetail,
     pageOptionsDto: PageOptionsDto,
   ): Promise<PageDto<Product>> {
-    console.log(filter);
-
     const { catId, properties, brand, type } = filter;
     const queryBuilder = this.productRepository
       .createQueryBuilder('product')

@@ -3,4 +3,5 @@ export type createCatDetail = {
   brands: Array<object>;
   types: Array<object>;
   properties: Array<object>;
+  photo: string;
 };
