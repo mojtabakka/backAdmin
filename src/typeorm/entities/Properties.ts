@@ -22,7 +22,7 @@ export class Properties extends AbstractEntity {
   @ManyToOne(() => PropertyTitles, (pt) => pt.properties)
   propertyTitle: PropertyTitles;
 
-  @ManyToMany(() => Product,{cascade:true})
+  @ManyToMany(() => Product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   products: Product[];
 
   @CreateDateColumn({

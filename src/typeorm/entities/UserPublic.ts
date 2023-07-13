@@ -43,7 +43,7 @@ export class UserPublic extends AbstractEntity {
   @JoinColumn()
   avatar: UserPhoto;
 
-  @OneToMany(() => Address, (address) => address.user)
+  @OneToMany(() => Address, (address) => address.user, { cascade: true })
   addresses: Address[];
 
   @OneToMany(() => Orders, (order) => order.user)

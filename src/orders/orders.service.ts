@@ -74,6 +74,8 @@ export class OrdersService {
   }
 
   async addToBasket(model: string, userInfo: any) {
+    console.log(userInfo);
+
     let result;
     let mySumPrice = 0;
     let mySumFinalPrice = 0;
@@ -86,14 +88,12 @@ export class OrdersService {
         id: userInfo.sub,
       })
       .getOne();
-
     const user = await this.userService.getPublicUser(userInfo.phoneNumber);
 
     const product = await this.productService.getProductNotExistInUserBsket(
       model,
       userInfo.sub,
     );
-
     const ProductBasket = !isEmptyArray(basket?.products)
       ? basket?.products
       : [];
@@ -103,7 +103,6 @@ export class OrdersService {
         const benefitOfPrice = +item?.priceForUser * (+item?.off / 100);
         myBefefit += +item.priceForUser * (+item.off / 100);
         mySumPrice += +item.priceForUser;
-
         mySumFinalPrice += +(+item.priceForUser - +benefitOfPrice);
       });
 
@@ -129,17 +128,34 @@ export class OrdersService {
     return result;
   }
 
-  async getCurrentBasket(id: number): Promise<Basket[] | undefined> {
-    const basket = await this.basketRepository
+  async getCurrentBasket(id: number): Promise<Basket[] | undefined | null> {
+    const queryBuilder = this.basketRepository
       .createQueryBuilder('basket')
       .leftJoinAndSelect('basket.products', 'products')
       .leftJoinAndSelect('products.photos', 'productPhotos')
       .where('basket.userId=:id', {
         id,
-      })
+      });
+    if ((await queryBuilder.getOne()).products.length === 0) {
+      return null;
+    }
+    queryBuilder
       .groupBy('products.model')
-      .addSelect(['COUNT(products.id) as number'])
-      .getRawMany();
+      .addSelect(['COUNT(products.id) as number']);
+
+    return queryBuilder.getRawMany();
+  }
+
+  async getCurrentBasketwithOutGorupBy(
+    id: number,
+  ): Promise<Basket | undefined> {
+    const basket = await this.basketRepository
+      .createQueryBuilder('basket')
+      .leftJoinAndSelect('basket.products', 'products')
+      .where('basket.userId=:id', {
+        id,
+      })
+      .getOne();
     return basket;
   }
 
@@ -152,7 +168,7 @@ export class OrdersService {
       })
       .getOne();
 
-    return basket.products.length;
+    return basket?.products ? basket.products.length : 0;
   }
 
   async getCurrentBasketWithOutRelations(
@@ -174,20 +190,20 @@ export class OrdersService {
     let result;
 
     const currentOrder = await this.getCurrentOrder(userInfo.sub);
-    const cart = await this.getCurrentBasketWithOutRelations(userInfo.sub);
+    const cart = await this.getCurrentBasketwithOutGorupBy(userInfo.sub);
+    const products = cart.products;
     const price = Math.round(cart.finalPrice);
     const finalPrice = Math.round(cart.finalPrice - cart.shippingPrice);
     const shippingPrice = cart.shippingPrice;
     const activeAddress = await this.addressService.getActiveAddress(
       userInfo?.sub,
     );
-
     if (isEmptyObject(currentOrder)) {
       const user = await this.userService.getPublicUser(userInfo.phoneNumber);
       const order = this.ordersRepository.create({
         user,
         address: activeAddress,
-        cart: cart,
+        products,
         status: orderStatus.NotPayed,
         shippingTime,
         shippingPrice,
@@ -198,7 +214,7 @@ export class OrdersService {
     } else {
       currentOrder.shippingPrice = shippingPrice;
       currentOrder.shippingTime = shippingTime;
-      currentOrder.cart = cart;
+      currentOrder.products = products;
       currentOrder.address = activeAddress;
       currentOrder.price = price;
       currentOrder.finalPrice = finalPrice;
@@ -268,15 +284,33 @@ export class OrdersService {
         id: id,
       })
       .execute();
-    return result;
+    if (state == orderStatus.Payed) {
+      const order = await this.ordersRepository.findOne({
+        relations: {
+          user: true,
+        },
+        where: { id },
+      });
+      const userId = order.user.id;
+      const basket = await this.basketRepository
+        .createQueryBuilder('basket')
+        .where('userId=:userId', { userId })
+        .getOne();
+      basket.purePrice = null;
+      basket.finalPrice = null;
+      basket.benefit = null;
+      basket.shippingPrice = null;
+      basket.products = [];
+      const result = await this.basketRepository.save(basket);
+    }
+    return null;
   }
 
   async getOrder(id: number): Promise<Orders | undefined> {
     const result = await this.ordersRepository
       .createQueryBuilder('orders')
       .leftJoinAndSelect('orders.address', 'address')
-      .leftJoinAndSelect('orders.cart', 'cart')
-      .leftJoinAndSelect('cart.products', 'products')
+      .leftJoinAndSelect('orders.products', 'products')
       .leftJoinAndSelect('orders.user', 'user')
       .leftJoinAndSelect('products.photos', 'photos')
       .where('orders.id=:id', { id })
@@ -301,8 +335,7 @@ export class OrdersService {
     let queryBuilder = this.ordersRepository
       .createQueryBuilder('orders')
       .leftJoinAndSelect('orders.address', 'address')
-      .leftJoinAndSelect('orders.cart', 'cart')
-      .leftJoinAndSelect('cart.products', 'products')
+      .leftJoinAndSelect('orders.products', 'products')
       .leftJoinAndSelect('orders.user', 'user')
       .leftJoinAndSelect('products.photos', 'photos');
     if (name) {
@@ -345,10 +378,9 @@ export class OrdersService {
       });
     }
 
-    queryBuilder
-      .orderBy('orders.created_at', pageOptionsDto.order)
-      .offset(pageOptionsDto.skip)
-      .limit(pageOptionsDto.take);
+    queryBuilder.orderBy('orders.created_at', pageOptionsDto.order);
+    // .offset(pageOptionsDto.skip)
+    // .limit(pageOptionsDto.take);
 
     const itemCount = await queryBuilder.getCount();
     const { entities } = await queryBuilder.getRawAndEntities();

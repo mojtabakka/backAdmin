@@ -21,6 +21,9 @@ export class TypeService {
     @InjectRepository(Brands)
     private brandsRepository: Repository<Brands>,
 
+    @InjectRepository(Category)
+    private catergoryRepository: Repository<Category>,
+
     @InjectRepository(Properties)
     private properitesRepository: Repository<Properties>,
 

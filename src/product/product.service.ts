@@ -10,14 +10,9 @@ import {
 } from './utils/types';
 import { ProductPhoto } from 'src/typeorm/entities/ProductPhoto';
 import { ProductStatuses } from 'src/constants';
-import {
-  getWordsonPersiankyboard,
-  isEmptyArray,
-} from 'src/common/utils/functions.utils';
+import { isEmptyArray } from 'src/common/utils/functions.utils';
 import { PageDto } from 'src/dtos/page.dto';
-import { User } from 'src/typeorm/entities/User';
 import { PageMetaDto, PageOptionsDto } from 'src/dtos';
-import { log } from 'console';
 @Injectable()
 export class ProductService {
   constructor(
@@ -288,5 +283,15 @@ export class ProductService {
       .groupBy('product.model')
       .getMany();
     return updateProduct;
+  }
+
+  async getProductsNotReserved(): Promise<Product[] | undefined> {
+    const data = await this.productRepository
+      .createQueryBuilder('product')
+      .where('userId=Null')
+      .groupBy('product.model')
+      .getMany();
+
+    return data;
   }
 }

@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   Param,
@@ -31,6 +32,16 @@ export class AddressController {
   @Get('get-active-address')
   async getActiveAddress(@Req() req, @Res() res) {
     const address = await this.addressService.getActiveAddress(req.user.sub);
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data: address,
+    });
+  }
+
+  @Roles(Role.User)
+  @Delete(':id')
+  async deleteAddress(@Param('id') id: number, @Res() res) {
+    const address = await this.addressService.deleteAddress(id);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
       data: address,

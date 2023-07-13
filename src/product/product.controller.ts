@@ -74,8 +74,6 @@ export class ProductController {
     });
   }
 
-  
-
   @Get()
   @Public()
   async getProducts(
@@ -153,6 +151,16 @@ export class ProductController {
   @Get('public/product-search/product-search')
   async serchProduct(@Query() search, @Res() res: Response) {
     const data = await this.productService.searchProduct(search.search);
+    res.status(HttpStatus.OK).json({
+      message: 'Product Updated successfully',
+      data,
+    });
+  }
+
+  @Roles(Role.User)
+  @Get('public/product-not-reserved/get-products-notReserved')
+  async getProductsNotReserved(@Query() search, @Res() res: Response) {
+    const data = await this.productService.getProductsNotReserved();
     res.status(HttpStatus.OK).json({
       message: 'Product Updated successfully',
       data,

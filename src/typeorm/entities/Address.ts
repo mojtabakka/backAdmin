@@ -35,10 +35,12 @@ export class Address extends AbstractEntity {
   @Column({ nullable: true })
   postalCode: string;
 
-  @ManyToOne(() => UserPublic, (user) => user.addresses)
+  @ManyToOne(() => UserPublic, (user) => user.addresses, {
+    onDelete: 'CASCADE',
+  })
   user: UserPublic;
 
-  @OneToMany(() => Orders, (orders) => orders.address)
+  @OneToMany(() => Orders, (orders) => orders.address, { cascade: true })
   orders: Orders[];
 
   @Column({ nullable: false, default: true })

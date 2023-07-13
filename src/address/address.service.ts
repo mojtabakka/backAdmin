@@ -24,6 +24,14 @@ export class AddressService {
     return address;
   }
 
+  async deleteAddress(id: number) {
+    console.log(id);
+    const address = await this.addressRepository.delete({ id });
+    console.log(address);
+
+    return address;
+  }
+
   async getActiveAddress(id: number): Promise<Address | undefined> {
     const address = await this.addressRepository
       .createQueryBuilder('address')

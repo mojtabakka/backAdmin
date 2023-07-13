@@ -60,14 +60,7 @@ export class AuthGuard implements CanActivate {
 
         const user = await this.userService.findOnePublic(payload.phoneNumber);
 
-        // const userRolses = this.getUserRoles(userRolsesObj);
 
-        // if (!this.checkRoles(userRolses, roles)) {
-        //   throw new HttpException(
-        //     'you can not access to this api',
-        //     HttpStatus.FORBIDDEN,
-        //   );
-        // }
         if (!user) {
           throw new HttpException(
             'you can not access to this api',

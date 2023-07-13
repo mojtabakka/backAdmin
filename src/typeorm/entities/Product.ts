@@ -16,6 +16,7 @@ import { Category } from './Category';
 import { ProductTypes } from './ProductTypes';
 import { Properties } from './Properties';
 import { AbstractEntity } from './common/Abstract';
+import { Orders } from './Order';
 
 @Entity()
 export class Product extends AbstractEntity {
@@ -48,17 +49,24 @@ export class Product extends AbstractEntity {
   shippingCost: string;
 
   @ManyToOne(() => Brands, (brand) => brand.products, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    cascade: true,
   })
   brand: Brands;
 
   @ManyToMany(() => Properties, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    cascade: true,
     eager: true,
   })
-  @JoinTable()
+  @JoinTable({
+    joinColumn: {
+      name: 'property_id',
+      referencedColumnName: 'id',
+    },
+    inverseJoinColumn: {
+      name: 'product_id',
+      referencedColumnName: 'id',
+    },
+  })
   properties: Properties[];
 
   @ManyToOne(() => Category, (category) => category.products, {
@@ -94,6 +102,9 @@ export class Product extends AbstractEntity {
 
   @ManyToOne(() => User, (user) => user.product, { eager: true })
   author: User;
+
+  @ManyToOne(() => Orders, (order) => order.products)
+  order: Orders;
 
   @ManyToMany(() => Basket, (basket) => basket.products, {
     onDelete: 'CASCADE',

@@ -20,6 +20,7 @@ import { generate } from 'otp-generator';
 import { AddMinutesToDate } from 'src/common/utils/functions.utils';
 import { UsersService } from 'src/users/users.service';
 import { CreateUserPublicDto } from './dtos/createUserPublic.dto';
+import { SendOtpDto } from './dtos/sendotp.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -63,10 +64,7 @@ export class AuthController {
 
   @Post('send-otp')
   @Public()
-  async sendOtp(
-    @Body() phoneNumber: { phoneNumber: string },
-    @Res() res: Response,
-  ) {
+  async sendOtp(@Body() phoneNumber: SendOtpDto, @Res() res: Response) {
     const otpCode = generate(4, {
       digits: true,
       alphabets: false,
@@ -105,7 +103,7 @@ export class AuthController {
 
     if (otp === null) {
       res.status(HttpStatus.NOT_FOUND).json({
-        message: 'otp in ivalid',
+        message: 'رمز یک بار مصرف اشتباه وارد شده است',
       });
       return;
     }

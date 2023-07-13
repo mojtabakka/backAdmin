@@ -16,6 +16,7 @@ import { Role } from 'src/constants';
 import { OrdersService } from './orders.service';
 import { SearchOrderDto } from './dtos/serchOrder.dto';
 import { PageOptionsDto } from 'src/dtos';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('orders')
 export class OrdersController {
@@ -90,6 +91,7 @@ export class OrdersController {
   }
 
   @Roles(Role.User)
+  @Public()
   @Get('get-current-basket-count')
   async getCurrentBasketCount(@Req() req, @Res() res) {
     const data = await this.orderService.getCurrentBasketCount(req.user.sub);

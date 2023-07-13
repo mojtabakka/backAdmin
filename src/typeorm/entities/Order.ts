@@ -42,6 +42,11 @@ export class Orders extends AbstractEntity {
   @ManyToOne(() => Basket, (basket) => basket.orders)
   cart: Basket;
 
-  @ManyToOne(() => Address, (address) => address.orders)
+  @OneToMany(() => Product, (product) => product.order)
+  products: Product[];
+
+  @ManyToOne(() => Address, (address) => address.orders, {
+    onDelete: 'CASCADE',
+  })
   address: Address;
 }
