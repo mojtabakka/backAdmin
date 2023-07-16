@@ -128,6 +128,7 @@ export class AuthController {
     const token = await this.authService.signInPublic(user);
     response.cookie('token', token.token, {
       httpOnly: false,
+      path: '/',
     });
     res.status(HttpStatus.OK).json({
       message: 'verified successfully',
