@@ -127,7 +127,7 @@ export class AuthController {
     }
     const token = await this.authService.signInPublic(user);
     response.cookie('token', token.token, {
-      httpOnly: false,
+      httpOnly: true,
       path: '/',
     });
     res.status(HttpStatus.OK).json({
