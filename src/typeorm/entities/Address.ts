@@ -17,10 +17,10 @@ export class Address extends AbstractEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   plaque: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   unit: string;
 
   @Column({ nullable: true, charset: 'utf8' })
@@ -43,18 +43,18 @@ export class Address extends AbstractEntity {
   @OneToMany(() => Orders, (orders) => orders.address, { cascade: true })
   orders: Orders[];
 
-  @Column({ nullable: false, default: true })
+  @Column({ nullable: true, charset: 'utf8' })
   active: boolean;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true, charset: 'utf8' })
   receivername: string;
 
-  @Column({ nullable: false, charset: 'utf8' })
+  @Column({ nullable: true, charset: 'utf8' })
   receiverlastname: string;
 
-  @Column({ nullable: false, charset: 'utf8' })
+  @Column({ nullable: true, charset: 'utf8' })
   recivermobile: string;
 
-  @Column({ nullable: false })
+  @Column({ nullable: true, charset: 'utf8' })
   address: string;
 }
