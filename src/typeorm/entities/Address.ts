@@ -32,7 +32,7 @@ export class Address extends AbstractEntity {
   @Column({ nullable: true, charset: 'utf8' })
   city: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, charset: 'utf8' })
   postalCode: string;
 
   @ManyToOne(() => UserPublic, (user) => user.addresses, {
@@ -43,7 +43,7 @@ export class Address extends AbstractEntity {
   @OneToMany(() => Orders, (orders) => orders.address, { cascade: true })
   orders: Orders[];
 
-  @Column({ nullable: true, charset: 'utf8' })
+  @Column({ nullable: true })
   active: boolean;
 
   @Column({ nullable: true, charset: 'utf8' })

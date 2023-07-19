@@ -73,58 +73,96 @@ export class OrdersService {
       : 0;
   }
 
-  async addToBasket(model: string, userInfo: any) {
-    console.log(userInfo);
+  async addToBasket(ids, userInfo: any) {
+    // let result;
+    // const basket = await this.basketRepository
+    //   .createQueryBuilder('basket')
+    //   .leftJoinAndSelect('basket.products', 'product')
+    //   .where('basket.userId=:id', {
+    //     id: userInfo.sub,
+    //   })
+    //   .getOne();
 
-    let result;
-    let mySumPrice = 0;
-    let mySumFinalPrice = 0;
-    let myBefefit = 0;
+    // const product = await this.productService.getProductNotExistInUserBsket(
+    //   model,
+    //   userInfo.sub,
+    // );
+    // const ProductBasket = !isEmptyArray(basket?.products)
+    //   ? basket?.products
+    //   : [];
+
+    // !isEmptyArray([product, ...ProductBasket]) &&
+    //   [product, ...ProductBasket].map((item) => {
+    //     const benefitOfPrice = +item?.priceForUser * (+item?.off / 100);
+    //     myBefefit += +item.priceForUser * (+item.off / 100);
+    //     mySumPrice += +item.priceForUser;
+    //     mySumFinalPrice += +(+item.priceForUser - +benefitOfPrice);
+    //   });
+
+    // delete product.baskets;
+    // if (basket) {
+    //   basket.products = [product, ...basket.products];
+    //   basket.purePrice = Math.round(mySumPrice);
+    //   basket.finalPrice = Math.round(mySumFinalPrice);
+    //   basket.benefit = Math.round(myBefefit);
+    //   basket.shippingPrice = shippingPrice;
+    //   result = await this.basketRepository.save(basket);
+    // } else {
+    //   const basketForSave = this.basketRepository.create({
+    //     user,
+    //     purePrice: Math.round(mySumPrice),
+    //     finalPrice: Math.round(mySumFinalPrice),
+    //     benefit: Math.round(myBefefit),
+    //     products: [product],
+    //     shippingPrice,
+    //   });
+    //   result = await this.basketRepository.save(basketForSave);
+    // }
+
+    let purePrice = 0;
+    let finalPrice = 0;
+    let benefit = 0;
     let shippingPrice = 29000;
-    const basket = await this.basketRepository
+    const user = await this.userService.getPublicUser(userInfo.phoneNumber);
+    let products = await this.productService.getProductsWithIds(ids);
+    !isEmptyArray(products);
+    products.map((item) => {
+      const benefitOfPrice = +item?.priceForUser * (+item?.off / 100);
+      benefit += +item.priceForUser * (+item.off / 100);
+      purePrice += +item.priceForUser;
+      finalPrice += +(+item.priceForUser - +benefitOfPrice);
+    });
+
+    if (!products) {
+      products = [];
+    }
+    let basket = await this.basketRepository
       .createQueryBuilder('basket')
       .leftJoinAndSelect('basket.products', 'product')
-      .where('basket.userId=:id', {
+      .where('basket.userId=2', {
         id: userInfo.sub,
       })
       .getOne();
-    const user = await this.userService.getPublicUser(userInfo.phoneNumber);
 
-    const product = await this.productService.getProductNotExistInUserBsket(
-      model,
-      userInfo.sub,
-    );
-    const ProductBasket = !isEmptyArray(basket?.products)
-      ? basket?.products
-      : [];
-
-    !isEmptyArray([product, ...ProductBasket]) &&
-      [product, ...ProductBasket].map((item) => {
-        const benefitOfPrice = +item?.priceForUser * (+item?.off / 100);
-        myBefefit += +item.priceForUser * (+item.off / 100);
-        mySumPrice += +item.priceForUser;
-        mySumFinalPrice += +(+item.priceForUser - +benefitOfPrice);
-      });
-
-    delete product.baskets;
-    if (basket) {
-      basket.products = [product, ...basket.products];
-      basket.purePrice = Math.round(mySumPrice);
-      basket.finalPrice = Math.round(mySumFinalPrice);
-      basket.benefit = Math.round(myBefefit);
-      basket.shippingPrice = shippingPrice;
-      result = await this.basketRepository.save(basket);
-    } else {
-      const basketForSave = this.basketRepository.create({
+    if (!basket) {
+      basket = this.basketRepository.create({
+        products: ids,
         user,
-        purePrice: Math.round(mySumPrice),
-        finalPrice: Math.round(mySumFinalPrice),
-        benefit: Math.round(myBefefit),
-        products: [product],
-        shippingPrice,
+        shippingPrice: shippingPrice,
+        benefit: benefit,
+        purePrice,
+        finalPrice,
       });
-      result = await this.basketRepository.save(basketForSave);
+      return this.basketRepository.save(basket);
     }
+
+    basket.products = products;
+    basket.shippingPrice = shippingPrice;
+    basket.finalPrice = finalPrice;
+    basket.purePrice = purePrice;
+    basket.benefit = benefit;
+    const result = await this.basketRepository.save(basket);
+
     return result;
   }
 
@@ -136,7 +174,7 @@ export class OrdersService {
       .where('basket.userId=:id', {
         id,
       });
-    if ((await queryBuilder.getOne()).products.length === 0) {
+    if ((await queryBuilder.getOne())?.products.length === 0) {
       return null;
     }
     queryBuilder

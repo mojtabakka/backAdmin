@@ -1,12 +1,4 @@
-import {
-  Entity,
-  Column,
-  ManyToOne,
-  ManyToMany,
-  JoinTable,
-  PrimaryColumn,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
 import { User } from './User';
 import { IsEmpty } from 'class-validator';
 import { ProductPhoto } from './ProductPhoto';

@@ -14,7 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { Response, Request } from 'express';
+import { Response, Request, query } from 'express';
 import { CreateProductDto } from './dtos/createProduct.dto';
 import { Roles } from 'src/decorators/roldes.decorator';
 import { Role } from 'src/constants';
@@ -157,10 +157,13 @@ export class ProductController {
     });
   }
 
-  @Roles(Role.User)
+  @Public()
   @Get('public/product-not-reserved/get-products-notReserved')
-  async getProductsNotReserved(@Query() search, @Res() res: Response) {
-    const data = await this.productService.getProductsNotReserved();
+  async getProductsNotReserved(
+    @Query() query: { ids: Array<string> },
+    @Res() res: Response,
+  ) {
+    const data = await this.productService.getProductNotReserved(query.ids);
     res.status(HttpStatus.OK).json({
       message: 'Product Updated successfully',
       data,

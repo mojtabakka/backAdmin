@@ -285,13 +285,27 @@ export class ProductService {
     return updateProduct;
   }
 
-  async getProductsNotReserved(): Promise<Product[] | undefined> {
-    const data = await this.productRepository
+  async getProductNotReserved(
+    ids: Array<string>,
+  ): Promise<Product | undefined> {
+    const queryBuilder = await this.productRepository
       .createQueryBuilder('product')
-      .where('userId=Null')
-      .groupBy('product.model')
-      .getMany();
 
-    return data;
+      .where('orderId is null ');
+    if (ids) {
+      queryBuilder.andWhere(' product.id NOT IN(:...ids) ', { ids });
+    }
+    return queryBuilder.getOne();
+  }
+
+  async getProductsWithIds(
+    ids: Array<number>,
+  ): Promise<Product[] | undefined | null> {
+    if (!isEmptyArray(ids)) {
+      return this.productRepository
+        .createQueryBuilder('product')
+        .where(' product.id  IN(:...ids) ', { ids })
+        .getMany();
+    } else return [];
   }
 }

@@ -72,9 +72,9 @@ export class OrdersController {
 
   @Roles(Role.User)
   @Post('addToBasket')
-  async addToBasket(@Body('model') model: string, @Req() req, @Res() res) {
-    const data = await this.orderService.addToBasket(model, req.user);
-    res.status(HttpStatus.OK).json({
+  async addToBasket(@Body() ids: Array<number>, @Req() req, @Res() res) {
+    const data = await this.orderService.addToBasket(ids, req.user);
+    res.status(HttpStatus.OK).json({  
       message: 'prodcut added to basket successfully',
       data,
     });

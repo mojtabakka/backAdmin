@@ -46,8 +46,8 @@ export class AuthGuard implements CanActivate {
       );
 
     const request = context.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(request);
 
+    const token = request.cookies.token;
     if (!token) {
       throw new UnauthorizedException();
     }
@@ -59,7 +59,6 @@ export class AuthGuard implements CanActivate {
         });
 
         const user = await this.userService.findOnePublic(payload.phoneNumber);
-
 
         if (!user) {
           throw new HttpException(
@@ -76,8 +75,9 @@ export class AuthGuard implements CanActivate {
         const payload = await this.jwtService.verifyAsync(token, {
           secret: jwtConstants.secret,
         });
-        const userRolsesObj = (await this.userService.findOne(payload.phoneNumber))
-          .roles;
+        const userRolsesObj = (
+          await this.userService.findOne(payload.phoneNumber)
+        ).roles;
 
         const userRolses = this.getUserRoles(userRolsesObj);
 
