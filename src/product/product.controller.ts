@@ -160,10 +160,13 @@ export class ProductController {
   @Public()
   @Get('public/product-not-reserved/get-products-notReserved')
   async getProductsNotReserved(
-    @Query() query: { ids: Array<string> },
+    @Query() query: { ids: Array<string>; model: string },
     @Res() res: Response,
   ) {
-    const data = await this.productService.getProductNotReserved(query.ids);
+    const data = await this.productService.getProductNotReserved(
+      query.ids,
+      query.model,
+    );
     res.status(HttpStatus.OK).json({
       message: 'Product Updated successfully',
       data,

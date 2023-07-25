@@ -74,57 +74,15 @@ export class OrdersService {
   }
 
   async addToBasket(ids, userInfo: any) {
-    // let result;
-    // const basket = await this.basketRepository
-    //   .createQueryBuilder('basket')
-    //   .leftJoinAndSelect('basket.products', 'product')
-    //   .where('basket.userId=:id', {
-    //     id: userInfo.sub,
-    //   })
-    //   .getOne();
-
-    // const product = await this.productService.getProductNotExistInUserBsket(
-    //   model,
-    //   userInfo.sub,
-    // );
-    // const ProductBasket = !isEmptyArray(basket?.products)
-    //   ? basket?.products
-    //   : [];
-
-    // !isEmptyArray([product, ...ProductBasket]) &&
-    //   [product, ...ProductBasket].map((item) => {
-    //     const benefitOfPrice = +item?.priceForUser * (+item?.off / 100);
-    //     myBefefit += +item.priceForUser * (+item.off / 100);
-    //     mySumPrice += +item.priceForUser;
-    //     mySumFinalPrice += +(+item.priceForUser - +benefitOfPrice);
-    //   });
-
-    // delete product.baskets;
-    // if (basket) {
-    //   basket.products = [product, ...basket.products];
-    //   basket.purePrice = Math.round(mySumPrice);
-    //   basket.finalPrice = Math.round(mySumFinalPrice);
-    //   basket.benefit = Math.round(myBefefit);
-    //   basket.shippingPrice = shippingPrice;
-    //   result = await this.basketRepository.save(basket);
-    // } else {
-    //   const basketForSave = this.basketRepository.create({
-    //     user,
-    //     purePrice: Math.round(mySumPrice),
-    //     finalPrice: Math.round(mySumFinalPrice),
-    //     benefit: Math.round(myBefefit),
-    //     products: [product],
-    //     shippingPrice,
-    //   });
-    //   result = await this.basketRepository.save(basketForSave);
-    // }
-
     let purePrice = 0;
     let finalPrice = 0;
     let benefit = 0;
     let shippingPrice = 29000;
     const user = await this.userService.getPublicUser(userInfo.phoneNumber);
+    console.log(user);
+    
     let products = await this.productService.getProductsWithIds(ids);
+
     !isEmptyArray(products);
     products.map((item) => {
       const benefitOfPrice = +item?.priceForUser * (+item?.off / 100);
@@ -136,23 +94,31 @@ export class OrdersService {
     if (!products) {
       products = [];
     }
+
+    console.log(userInfo);
+    
     let basket = await this.basketRepository
       .createQueryBuilder('basket')
-      .leftJoinAndSelect('basket.products', 'product')
-      .where('basket.userId=2', {
+      .leftJoinAndSelect('basket.user', 'user')
+      .where('user.id=:id', {
         id: userInfo.sub,
       })
       .getOne();
+      console.log(basket);
+      
 
     if (!basket) {
+      console.log('hello');
+      
       basket = this.basketRepository.create({
-        products: ids,
-        user,
+        products: products,
+        // user,
         shippingPrice: shippingPrice,
         benefit: benefit,
         purePrice,
         finalPrice,
       });
+
       return this.basketRepository.save(basket);
     }
 
@@ -166,22 +132,16 @@ export class OrdersService {
     return result;
   }
 
-  async getCurrentBasket(id: number): Promise<Basket[] | undefined | null> {
-    const queryBuilder = this.basketRepository
+  async getCurrentBasket(id: number): Promise<Basket | undefined | null> {
+    const queryBuilder = await this.basketRepository
       .createQueryBuilder('basket')
       .leftJoinAndSelect('basket.products', 'products')
       .leftJoinAndSelect('products.photos', 'productPhotos')
       .where('basket.userId=:id', {
         id,
-      });
-    if ((await queryBuilder.getOne())?.products.length === 0) {
-      return null;
-    }
-    queryBuilder
-      .groupBy('products.model')
-      .addSelect(['COUNT(products.id) as number']);
-
-    return queryBuilder.getRawMany();
+      })
+      .getOne();
+    return queryBuilder;
   }
 
   async getCurrentBasketwithOutGorupBy(

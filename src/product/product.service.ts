@@ -287,11 +287,11 @@ export class ProductService {
 
   async getProductNotReserved(
     ids: Array<string>,
+    model:string
   ): Promise<Product | undefined> {
     const queryBuilder = await this.productRepository
       .createQueryBuilder('product')
-
-      .where('orderId is null ');
+      .where('orderId is null and model=:model',{model});
     if (ids) {
       queryBuilder.andWhere(' product.id NOT IN(:...ids) ', { ids });
     }

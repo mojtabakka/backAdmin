@@ -36,6 +36,11 @@ export class AuthController {
       signInDto.phoneNumber,
       signInDto.password,
     );
+    res.cookie('token', data.token, {
+      httpOnly: true,
+      path: '/',
+    });
+
     res.status(HttpStatus.OK).json({
       message: 'login Successfull',
       data,
@@ -80,8 +85,8 @@ export class AuthController {
       otpCode,
       expiration_time,
     );
-    console.log(data.otp);
-
+    console.log(otpCode);
+    
     res.status(HttpStatus.OK).json({
       message: `otp sent to your phone`,
       data: {
