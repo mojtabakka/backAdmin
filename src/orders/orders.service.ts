@@ -101,9 +101,8 @@ export class OrdersService {
         id: userInfo.sub,
       })
       .getOne();
-   
-    if (!basket) {ƒ
 
+    if (!basket) {
       basket = this.basketRepository.create({
         products: products,
         // user,
