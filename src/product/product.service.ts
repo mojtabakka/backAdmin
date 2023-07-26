@@ -238,6 +238,7 @@ export class ProductService {
     const products = await this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.baskets', 'basket')
+      .leftJoinAndSelect('product.photos', 'photos')
       .where('product.model=:model', {
         model,
         id,
@@ -287,11 +288,12 @@ export class ProductService {
 
   async getProductNotReserved(
     ids: Array<string>,
-    model:string
+    model: string,
   ): Promise<Product | undefined> {
     const queryBuilder = await this.productRepository
       .createQueryBuilder('product')
-      .where('orderId is null and model=:model',{model});
+      .leftJoinAndSelect('product.photos', 'photos')
+      .where('orderId is null and model=:model', { model });
     if (ids) {
       queryBuilder.andWhere(' product.id NOT IN(:...ids) ', { ids });
     }
