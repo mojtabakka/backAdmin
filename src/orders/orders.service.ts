@@ -79,8 +79,7 @@ export class OrdersService {
     let benefit = 0;
     let shippingPrice = 29000;
     const user = await this.userService.getPublicUser(userInfo.phoneNumber);
-    console.log(user);
-    
+
     let products = await this.productService.getProductsWithIds(ids);
 
     !isEmptyArray(products);
@@ -95,8 +94,6 @@ export class OrdersService {
       products = [];
     }
 
-    console.log(userInfo);
-    
     let basket = await this.basketRepository
       .createQueryBuilder('basket')
       .leftJoinAndSelect('basket.user', 'user')
@@ -104,12 +101,9 @@ export class OrdersService {
         id: userInfo.sub,
       })
       .getOne();
-      console.log(basket);
-      
+   
+    if (!basket) {ƒ
 
-    if (!basket) {
-      console.log('hello');
-      
       basket = this.basketRepository.create({
         products: products,
         // user,

@@ -57,7 +57,6 @@ export function getWordsonPersiankyboard(word): string {
   ].forEach((item) => {
     const replace = `${item.en}\\d`;
     const re = new RegExp(replace, 'g');
-    console.log(word.replace(re, item.fa));
     word = word.replace(re, item.fa);
   });
   return word;
