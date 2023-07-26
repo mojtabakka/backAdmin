@@ -32,10 +32,11 @@ export class AddressService {
   async getActiveAddress(id: number): Promise<Address | undefined> {
     const address = await this.addressRepository
       .createQueryBuilder('address')
-      .where('userId=:id and active=1', {
+      .where('userId=:id  and active=1 ', {
         id,
       })
       .getOne();
+    console.log(address);
 
     return address;
   }
@@ -57,6 +58,7 @@ export class AddressService {
     const address = this.addressRepository.create({
       ...crateAddresDetial,
       user: user,
+      active: true,
     });
 
     const result = await this.addressRepository.save(address);

@@ -32,6 +32,8 @@ export class AddressController {
   @Get('get-active-address')
   async getActiveAddress(@Req() req, @Res() res) {
     const address = await this.addressService.getActiveAddress(req.user.sub);
+    console.log(address);
+
     res.status(HttpStatus.OK).json({
       message: 'successfully',
       data: address,
