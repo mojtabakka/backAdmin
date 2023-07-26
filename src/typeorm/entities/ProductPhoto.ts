@@ -2,8 +2,6 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
   ManyToMany,
   JoinTable,
 } from 'typeorm';
@@ -15,7 +13,7 @@ export class ProductPhoto extends AbstractEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ nullable: true, charset: 'utf8' })
   src: string;
 
   @ManyToMany(() => Product, (product) => product.photos, { cascade: true })
