@@ -36,6 +36,8 @@ export class OrdersController {
   @Roles(Role.User)
   @Get('current-orders')
   async getCurrentOrders(@Req() req, @Res() res) {
+    console.log('hello');
+
     const orders = await this.orderService.getCurrentOrders(req.user.sub);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
@@ -74,7 +76,7 @@ export class OrdersController {
   @Post('addToBasket')
   async addToBasket(@Body() ids: Array<number>, @Req() req, @Res() res) {
     const data = await this.orderService.addToBasket(ids, req.user);
-    res.status(HttpStatus.OK).json({  
+    res.status(HttpStatus.OK).json({
       message: 'prodcut added to basket successfully',
       data,
     });
@@ -153,6 +155,23 @@ export class OrdersController {
     @Res() res,
   ) {
     const data = await this.orderService.changeOrderStatus(id, status.state);
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data,
+    });
+  }
+
+  @Roles(Role.User)
+  @Patch('change-order-status-public/:id')
+  async changeOrderStatusPublic(
+    @Param('id') id: number,
+    @Body() status,
+    @Res() res,
+  ) {
+    const data = await this.orderService.changeOrderStatusPublic(
+      id,
+      status.state,
+    );
     res.status(HttpStatus.OK).json({
       message: 'successfully',
       data,

@@ -36,12 +36,13 @@ export class ProductController {
     @Req() req,
     @Res() res: Response,
   ) {
+    console.log('hell');
+
     const data: Product[] | undefined = await this.productService.createProduct(
       createProductDto,
       createProductDto.numberOfExist,
       req.user.username,
     );
-
     res.status(HttpStatus.OK).json({
       message: 'productCreated successfully',
       data,

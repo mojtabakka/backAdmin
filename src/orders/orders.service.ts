@@ -12,6 +12,7 @@ import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { searchOrder } from './utils/types/searchOrder';
 import { PageDto, PageMetaDto, PageOptionsDto } from 'src/dtos';
+import { STATUS_CODES } from 'http';
 
 @Injectable()
 export class OrdersService {
@@ -105,7 +106,7 @@ export class OrdersService {
     if (!basket) {
       basket = this.basketRepository.create({
         products: products,
-        // user,
+        user,
         shippingPrice: shippingPrice,
         benefit: benefit,
         purePrice,
@@ -134,6 +135,8 @@ export class OrdersService {
         id,
       })
       .getOne();
+    console.log('queryBuilder', queryBuilder);
+
     return queryBuilder;
   }
 
@@ -215,13 +218,16 @@ export class OrdersService {
   }
 
   async getCurrentOrder(id: number): Promise<Orders | undefined> {
-    return this.ordersRepository
+    const order = await this.ordersRepository
       .createQueryBuilder('orders')
       .where('userId=:id and status=:status', {
         id,
         status: orderStatus.NotPayed,
       })
       .getOne();
+    console.log(order);
+
+    return order;
   }
 
   async getCurrentOrders(id: number): Promise<Orders[] | undefined> {
@@ -294,6 +300,34 @@ export class OrdersService {
       basket.products = [];
       const result = await this.basketRepository.save(basket);
     }
+    return null;
+  }
+
+  async changeOrderStatusPublic(id: number, state: string) {
+    await this.ordersRepository
+      .createQueryBuilder('orders')
+      .update(Orders)
+      .set({ status: orderStatus.Payed })
+      .where('id=:id', {
+        id: id,
+      })
+      .execute();
+
+    const order = await this.ordersRepository.findOne({
+      relations: {
+        user: true,
+      },
+      where: { id },
+    });
+
+    const userId = order.user.id;
+    await this.basketRepository
+      .createQueryBuilder('basket')
+      .delete()
+      .from(Basket)
+      .where('userId=:userId', { userId })
+      .execute();
+
     return null;
   }
 

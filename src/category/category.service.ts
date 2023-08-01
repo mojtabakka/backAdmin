@@ -10,7 +10,7 @@ export class CategoryService {
     @InjectRepository(Category)
     private catergoryRepository: Repository<Category>,
   ) {}
-  async createCat(
+  async createCat(  
     createCatDetail: CreateCatDto,
   ): Promise<Category | undefined> {
     const findcat = await this.catergoryRepository.findOneBy({
