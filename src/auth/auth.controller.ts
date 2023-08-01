@@ -32,6 +32,8 @@ export class AuthController {
   @Post('admin/login')
   @Public()
   async login(@Body() signInDto: SigninDto, @Res() res: Response) {
+    console.log('loggggigngngn');
+    
     const data = await this.authService.signIn(
       signInDto.phoneNumber,
       signInDto.password,
