@@ -143,6 +143,7 @@ export class ProductService {
     const product = await this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.photos', 'photos')
+      .leftJoinAndSelect('product.properties', 'properties')
       .groupBy('product.model')
       .where('product.model = :model', { model: model.trim() })
       .getOne();
