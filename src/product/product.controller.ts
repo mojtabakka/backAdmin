@@ -167,6 +167,7 @@ export class ProductController {
     const data = await this.productService.getProductNotReserved(
       query.ids,
       query.model,
+      
     );
     res.status(HttpStatus.OK).json({
       message: 'Product Updated successfully',
