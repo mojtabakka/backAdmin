@@ -13,6 +13,7 @@ import { Roles } from 'src/decorators/roldes.decorator';
 import { Role } from 'src/constants';
 import { AddressService } from './address.service';
 import { createAddressDto } from './dtos/createAddress.dto';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @Controller('address')
 export class AddressController {
@@ -78,6 +79,48 @@ export class AddressController {
     await this.addressService.changeActiveAddress(id, req.user);
     res.status(HttpStatus.OK).json({
       message: 'active address changed successfully',
+    });
+  }
+
+  @Public()
+  @Get('get-weather')
+  async getWeather(@Res() res) {
+    console.log('hello');
+    const data = {
+      today: {
+        temp: 10,
+        status: 'sunny',
+      },
+
+      Sun: {
+        temp: 10,
+        status: 'sunny',
+      },
+
+      Mon: {
+        temp: 10,
+        status: 'sunny',
+      },
+      Tues: {
+        temp: 10,
+        status: 'sunny',
+      },
+      Wed: {
+        temp: 10,
+        status: 'sunny',
+      },
+      Thurs: {
+        temp: 10,
+        status: 'sunny',
+      },
+      Fri: {
+        temp: 10,
+        status: 'sunny',
+      },
+    };
+    res.status(HttpStatus.OK).json({
+      message: 'active address changed successfully',
+      data,
     });
   }
 }
