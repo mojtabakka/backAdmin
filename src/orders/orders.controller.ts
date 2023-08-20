@@ -28,7 +28,8 @@ export class OrdersController {
     const data = await this.orderService.removeOrder(model, req.user, res);
 
     res.status(HttpStatus.OK).json({
-      message: 'order recorded successfully',
+
+      message: 'order recorded successfullyyy',
       data,
     });
   }
