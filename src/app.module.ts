@@ -33,6 +33,7 @@ import { PropertyTitles } from './typeorm/entities/PropertyTitles';
 import { Properties } from './typeorm/entities/Properties';
 import { ConfigModule } from '@nestjs/config';
 import { CategoryModule } from './category/category.module';
+import { env } from 'process';
 
 @Module({
   imports: [
@@ -45,12 +46,14 @@ import { CategoryModule } from './category/category.module';
       dest: './uplaods',
     }),
     TypeOrmModule.forRoot({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '0019058101Aa@',
-      database: 'shop',
+      // @ts-ignore
+      type: env.DATABASE_USERNAME,
+      host: env.DATABASE_HOST ,
+      // @ts-ignore
+      port: env.DATABASE_PORT,
+      username: env.DATABASE_USERNAME,
+      password: env.DATABASE_PASSWORD,
+      database: env.DATABASE,
       entities: [
         User,
         Role,
