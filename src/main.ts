@@ -14,10 +14,10 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
   app.enableCors({
     origin: true,
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    methods: 'GET,HEAD,PUT,P`ATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
   app.use(cookieParser());
-  await app.listen(3000);
+  await app.listen(3003);
 }
 bootstrap();

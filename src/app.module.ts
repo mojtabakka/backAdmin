@@ -47,11 +47,11 @@ import { env } from 'process';
     }),
     TypeOrmModule.forRoot({
       // @ts-ignore
-      type: env.DATABASE_USERNAME,
+      type: env.DATABASE_NAME,
       host: env.DATABASE_HOST ,
       // @ts-ignore
       port: env.DATABASE_PORT,
-      username: env.DATABASE_USERNAME,
+      username: "root",
       password: env.DATABASE_PASSWORD,
       database: env.DATABASE,
       entities: [

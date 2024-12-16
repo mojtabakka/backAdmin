@@ -38,7 +38,6 @@ export class AuthGuard implements CanActivate {
     if (checkAdmin && checkUser) {
       throw new HttpException('roles is incorrect', HttpStatus.FORBIDDEN);
     }
-
     if (!roles || !roles[0])
       throw new HttpException(
         'you can not access to this api',
@@ -46,9 +45,7 @@ export class AuthGuard implements CanActivate {
       );
 
     const request = context.switchToHttp().getRequest();
-
-    const token = request.cookies.token;
-
+    const token = request.headers.authorization;
     if (!token) {
       throw new UnauthorizedException();
     }
@@ -58,14 +55,9 @@ export class AuthGuard implements CanActivate {
         const payload = await this.jwtService.verifyAsync(token, {
           secret: jwtConstants.secret,
         });
-
-        const user = await this.userService.findOnePublic(payload.phoneNumber);
-
+        const user = await this.userService.findOnePublic(payload?.sub);
         if (!user) {
-          throw new HttpException(
-            'you can not access to this api',
-            HttpStatus.FORBIDDEN,
-          );
+          throw new HttpException('کاربر وجود ندارد', HttpStatus.FORBIDDEN);
         }
         request['user'] = payload;
       } catch (error) {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from 'express';
 import { AddressService } from 'src/address/address.service';
@@ -12,7 +12,7 @@ import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { searchOrder } from './utils/types/searchOrder';
 import { PageDto, PageMetaDto, PageOptionsDto } from 'src/dtos';
-import { STATUS_CODES } from 'http';
+import { uniqBy } from 'lodash';
 
 @Injectable()
 export class OrdersService {
@@ -74,56 +74,107 @@ export class OrdersService {
       : 0;
   }
 
-  async addToBasket(ids, userInfo: any) {
+  async addToBasket(cartId: number, model: string) {
+    let idCart = cartId;
     let purePrice = 0;
     let finalPrice = 0;
     let benefit = 0;
     let shippingPrice = 29000;
-    const user = await this.userService.getPublicUser(userInfo.phoneNumber);
+    const currentCart = await this.getCurrentCartWithCartId(idCart);
+    const mainIds = currentCart?.products.map((item) => item.id) || [];
+    const notReservedProducts = await this.productService.getProductNotReserved(
+      mainIds,
+      model,
+    );
+    //-------------------------
 
-    let products = await this.productService.getProductsWithIds(ids);
+    if (notReservedProducts?.id) {
+      let products = await this.productService.getProductsWithIds([
+        ...mainIds,
+        notReservedProducts.id,
+      ]);
+      //----------------------
+      !isEmptyArray(products) &&
+        products.map((item) => {
+          const benefitOfPrice = +item?.priceForUser * (+item?.off / 100);
+          benefit += +item.priceForUser * (+item.off / 100);
+          purePrice += +item.priceForUser;
+          finalPrice += +(+item.priceForUser - +benefitOfPrice);
+        });
+      if (!products) {
+        products = [];
+      }
 
-    !isEmptyArray(products);
-    products.map((item) => {
-      const benefitOfPrice = +item?.priceForUser * (+item?.off / 100);
-      benefit += +item.priceForUser * (+item.off / 100);
-      purePrice += +item.priceForUser;
-      finalPrice += +(+item.priceForUser - +benefitOfPrice);
+      //------------
+      if (idCart) {
+        let basket = await this.basketRepository.findOneBy({ id: idCart });
+        basket.products = products;
+        basket.shippingPrice = shippingPrice;
+        basket.finalPrice = finalPrice;
+        basket.purePrice = purePrice;
+        basket.benefit = benefit;
+        const response = await this.basketRepository.save(basket);
+        idCart = response.id;
+      } else {
+        const newCart = this.basketRepository.create({
+          products: products,
+          shippingPrice: shippingPrice,
+          benefit: benefit,
+          purePrice,
+          finalPrice,
+        });
+        const response = await this.basketRepository.save(newCart);
+        idCart = response.id;
+      }
+      //--------------
+      const currentCart = await this.getCurrentCartWithCartId(idCart);
+      console.log(currentCart);
+      return {
+        cartId: idCart,
+        count: +currentCart?.products.filter(
+          (product) => product.model === model,
+        ).length,
+        total: +currentCart?.products.length,
+      };
+    }
+
+    return {
+      count: +currentCart.products.filter((product) => product.model === model)
+        .length,
+      total: +currentCart.products.length,
+      cartId: +cartId,
+    };
+  }
+
+  async removeFromCart(cartId: number, model: string): Promise<any> {
+    const cart = await this.basketRepository.findOne({
+      where: { id: cartId },
+      relations: ['products'],
     });
 
-    if (!products) {
-      products = [];
+    if (!cart) {
+      throw new Error('Cart not found');
     }
-
-    let basket = await this.basketRepository
-      .createQueryBuilder('basket')
-      .leftJoinAndSelect('basket.user', 'user')
-      .where('user.id=:id', {
-        id: userInfo.sub,
-      })
-      .getOne();
-
-    if (!basket) {
-      basket = this.basketRepository.create({
-        products: products,
-        user,
-        shippingPrice: shippingPrice,
-        benefit: benefit,
-        purePrice,
-        finalPrice,
-      });
-
-      return this.basketRepository.save(basket);
+    const productToRemove = cart.products.find(
+      (product) => product.model === model,
+    );
+    if (!productToRemove) {
+      throw new Error('Product not found in the cart');
     }
+    await this.basketRepository
+      .createQueryBuilder()
+      .relation('products')
+      .of(cart)
+      .remove(productToRemove);
 
-    basket.products = products;
-    basket.shippingPrice = shippingPrice;
-    basket.finalPrice = finalPrice;
-    basket.purePrice = purePrice;
-    basket.benefit = benefit;
-    const result = await this.basketRepository.save(basket);
-
-    return result;
+    const updatedCart = await this.basketRepository.findOne({
+      where: { id: cartId },
+      relations: ['products'],
+    });
+    return {
+      count: updatedCart.products.filter((item) => item.model === model).length,
+      total: updatedCart.products.length,
+    };
   }
 
   async getCurrentBasket(id: number): Promise<Basket | undefined | null> {
@@ -135,9 +186,52 @@ export class OrdersService {
         id,
       })
       .getOne();
-    console.log('queryBuilder', queryBuilder);
-
     return queryBuilder;
+  }
+
+  async getCurrentCartWithCartId(id: number) {
+    const queryBuilder = await this.basketRepository
+      .createQueryBuilder('basket')
+      .leftJoinAndSelect('basket.products', 'products')
+      .leftJoinAndSelect('products.photos', 'productPhotos')
+      .where('basket.id=:id', {
+        id,
+      })
+      .getOne();
+    return queryBuilder;
+  }
+
+  async getCurrentCartWithCartIdAndProductModelCount(
+    id: number,
+    model: string,
+  ) {
+    const productInBasket = await this.basketRepository
+      .createQueryBuilder('basket')
+      .leftJoinAndSelect('basket.products', 'products')
+      .where(' basket.id=:id  ', {
+        model,
+        id: id,
+      })
+      .getOne();
+
+    return {
+      count:
+        productInBasket?.products.filter((item) => item.model === model)
+          .length || 0,
+      total: productInBasket?.products.length || 0,
+    };
+  }
+
+  async getCurrentCartWithCartIdAndProductModel(id: number, model: string) {
+    const productInBasket = await this.basketRepository
+      .createQueryBuilder('basket')
+      .leftJoinAndSelect('basket.products', 'products')
+      .where('products.model=:model and basket.id=:id  ', {
+        model,
+        id: id,
+      })
+      .getMany();
+    return productInBasket;
   }
 
   async getCurrentBasketwithOutGorupBy(
@@ -161,8 +255,63 @@ export class OrdersService {
         id,
       })
       .getOne();
-
     return basket?.products ? basket.products.length : 0;
+  }
+
+  async AddToCartAfterLogin(cartId, id: number) {
+    let Fakecart;
+    const mainCart = await this.basketRepository
+      .createQueryBuilder('basket')
+      .leftJoinAndSelect('basket.products', 'products')
+      .where('basket.userId=:id', {
+        id,
+      })
+      .getOne();
+
+    if (cartId) {
+      Fakecart = await this.basketRepository
+        .createQueryBuilder('basket')
+        .leftJoinAndSelect('basket.products', 'products')
+        .where('basket.id=:id', {
+          id: cartId,
+        })
+        .getOne();
+    }
+
+    if (mainCart && Fakecart) {
+      const products = uniqBy(
+        [...Fakecart?.products, ...mainCart?.products],
+        'id',
+      );
+      mainCart.products = products;
+      await this.basketRepository.save(mainCart);
+      await this.basketRepository.remove(Fakecart);
+      return {
+        cartId: mainCart.id,
+        total: products.length,
+      };
+    } else if (mainCart && !Fakecart) {
+      return {
+        cartId: mainCart.id,
+        total: mainCart.products.length,
+      };
+    } else if (!mainCart && Fakecart) {
+      Fakecart.userId = id;
+      await this.basketRepository.save(Fakecart);
+      return {
+        cartId: Fakecart.id,
+        total: Fakecart.products.length,
+      };
+    } else {
+      const user = await this.userService.getPublicUserById(id);
+      const cart = this.basketRepository.create({
+        user,
+      });
+      await this.basketRepository.save(cart);
+      return {
+        cartId: cart.id,
+      };
+    }
   }
 
   async getCurrentBasketWithOutRelations(
@@ -220,13 +369,13 @@ export class OrdersService {
   async getCurrentOrder(id: number): Promise<Orders | undefined> {
     const order = await this.ordersRepository
       .createQueryBuilder('orders')
-      .where('userId=:id and status=:status', {
+      .leftJoinAndSelect('orders.cart', 'cart')
+      .where('orders.userId = :id and orders.status = :status', {
         id,
         status: orderStatus.NotPayed,
       })
       .getOne();
     console.log(order);
-
     return order;
   }
 

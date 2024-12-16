@@ -28,7 +28,6 @@ export class OrdersController {
     const data = await this.orderService.removeOrder(model, req.user, res);
 
     res.status(HttpStatus.OK).json({
-
       message: 'order recorded successfullyyy',
       data,
     });
@@ -73,20 +72,58 @@ export class OrdersController {
     });
   }
 
-  @Roles(Role.User)
-  @Post('addToBasket')
-  async addToBasket(@Body() ids: Array<number>, @Req() req, @Res() res) {
-    const data = await this.orderService.addToBasket(ids, req.user);
+  @Public()
+  @Post('addToCart')
+  async addToBasket(
+    @Body() body: { cartId: number; model: string },
+    @Res() res,
+  ) {
+    const data = await this.orderService.addToBasket(body.cartId, body.model);
     res.status(HttpStatus.OK).json({
       message: 'prodcut added to basket successfully',
       data,
     });
   }
 
-  @Roles(Role.User)
-  @Get('getCurrentBasket')
-  async getCurrentBasket(@Req() req, @Res() res) {
-    const data = await this.orderService.getCurrentBasket(req.user.sub);
+  @Public()
+  @Post('RemoveFromCart')
+  async Update(
+    @Body() body: { cartId: number; model: string },
+    @Req() req,
+    @Res() res,
+  ) {
+    const data = await this.orderService.removeFromCart(
+      body.cartId,
+      body.model,
+    );
+    res.status(HttpStatus.OK).json({
+      message: 'prodcut added to basket successfully',
+      data,
+    });
+  }
+
+  @Public()
+  @Get('getCurrentBasket/:id')
+  async getCurrentBasket(@Param('id') id: number, @Res() res) {
+    const data = await this.orderService.getCurrentCartWithCartId(id);
+    res.status(HttpStatus.OK).json({
+      message: 'Successfully',
+      data,
+    });
+  }
+
+  @Public()
+  @Get('getCurrentCartWithModel/:id')
+  async getCurrentCartWithModel(
+    @Param('id') id: number,
+    @Query() model: { model: string },
+    @Res() res,
+  ) {
+    const data =
+      await this.orderService.getCurrentCartWithCartIdAndProductModelCount(
+        id,
+        model.model,
+      );
     res.status(HttpStatus.OK).json({
       message: 'Successfully',
       data,
@@ -98,6 +135,16 @@ export class OrdersController {
   @Get('get-current-basket-count')
   async getCurrentBasketCount(@Req() req, @Res() res) {
     const data = await this.orderService.getCurrentBasketCount(req.user.sub);
+    res.status(HttpStatus.OK).json({
+      message: 'Successfully',
+      data,
+    });
+  }
+
+  @Roles(Role.User)
+  @Get('add-to-cart-after-login/:id')
+  async addToCartAfterLogin(@Req() req, @Param('id') id: number, @Res() res) {
+    const data = await this.orderService.AddToCartAfterLogin(id, req.user.sub);
     res.status(HttpStatus.OK).json({
       message: 'Successfully',
       data,
@@ -129,7 +176,7 @@ export class OrdersController {
 
   @Roles(Role.Admin)
   @Get()
-  async getOrders(@Query() query, @Req() req, @Res() res) {
+  async getOrders(@Query() query, @Res() res) {
     const data = await this.orderService.getOrders(query.status);
     res.status(HttpStatus.OK).json({
       message: 'successfully',

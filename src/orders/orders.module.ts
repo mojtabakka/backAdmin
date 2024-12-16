@@ -13,6 +13,7 @@ import { Orders } from 'src/typeorm/entities/Order';
 import { Basket } from 'src/typeorm/entities/‌Basket';
 import { Address } from 'src/typeorm/entities/Address';
 import { AddressService } from 'src/address/address.service';
+import { Category } from 'src/typeorm/entities/Category';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AddressService } from 'src/address/address.service';
       Orders,
       Basket,
       Address,
+      Category,
     ]),
   ],
   controllers: [OrdersController],

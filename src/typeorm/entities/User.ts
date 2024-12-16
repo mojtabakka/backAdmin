@@ -13,13 +13,13 @@ import { AbstractEntity } from './common/Abstract';
 
 @Entity()
 export class User extends AbstractEntity {
-  @Column({ nullable: true,charset:'utf8' })
+  @Column({ nullable: true, charset: 'utf8' })
   username: string;
 
-  @Column({ nullable: true,charset:'utf8' })
+  @Column({ nullable: true, charset: 'utf8' })
   name: string;
 
-  @Column({ nullable: true,charset:'utf8' })
+  @Column({ nullable: true, charset: 'utf8' })
   lastName: string;
 
   @Column({ nullable: true })
@@ -28,7 +28,7 @@ export class User extends AbstractEntity {
   @Column({ nullable: true })
   email: string;
 
-  @Column({ nullable: true,charset:'utf8' })
+  @Column({ nullable: true, charset: 'utf8' })
   phoneNumber: string;
 
   @Column({ nullable: true })
@@ -42,17 +42,4 @@ export class User extends AbstractEntity {
 
   @OneToMany(() => Product, (role) => role.author)
   product: Product[];
-
-  @CreateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-  })
-  public created_at: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP(6)',
-    onUpdate: 'CURRENT_TIMESTAMP(6)',
-  })
-  public updated_at: Date;
 }

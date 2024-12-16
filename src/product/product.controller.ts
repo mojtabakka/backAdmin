@@ -36,8 +36,6 @@ export class ProductController {
     @Req() req,
     @Res() res: Response,
   ) {
-    console.log('hell');
-
     const data: Product[] | undefined = await this.productService.createProduct(
       createProductDto,
       createProductDto.numberOfExist,
@@ -66,8 +64,7 @@ export class ProductController {
     @Res() res: Response,
     @Req() req: Request,
   ) {
-    const src =
-      req.protocol + '://' + req.hostname + ':3003/' + file[0].path.slice(7);
+    const src = file[0].path.slice(7);
     const data = await this.productService.uploadProductImage(src);
     res.status(HttpStatus.OK).json({
       message: 'File uploaded successfully',
@@ -148,7 +145,7 @@ export class ProductController {
     });
   }
 
-  @Roles(Role.User)
+  @Public()
   @Get('public/product-search/product-search')
   async serchProduct(@Query() search, @Res() res: Response) {
     const data = await this.productService.searchProduct(search.search);
@@ -158,20 +155,19 @@ export class ProductController {
     });
   }
 
-  @Public()
-  @Get('public/product-not-reserved/get-products-notReserved')
-  async getProductsNotReserved(
-    @Query() query: { ids: Array<string>; model: string },
-    @Res() res: Response,
-  ) {
-    const data = await this.productService.getProductNotReserved(
-      query.ids,
-      query.model,
-
-    );
-    res.status(HttpStatus.OK).json({
-      message: 'Product Updated successfully',
-      data,
-    });
-  }
+  // @Public()
+  // @Get('public/product-not-reserved/get-products-notReserved')
+  // async getProductsNotReserved(
+  //   @Query() query: { ids: string; model: string },
+  //   @Res() res: Response,
+  // ) {
+  //   const data = await this.productService.getProductNotReserved(
+  //     query.ids,
+  //     query.model,
+  //   );
+  //   res.status(HttpStatus.OK).json({
+  //     message: 'Product Updated successfully',
+  //     data,
+  //   });
+  // }
 }

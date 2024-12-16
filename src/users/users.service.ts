@@ -34,8 +34,8 @@ export class UsersService {
       relations: ['roles'],
     });
   }
-  async findOnePublic(phoneNumber: string): Promise<UserPublic | undefined> {
-    return this.userPublicRepository.findOneBy({});
+  async findOnePublic(id: number): Promise<UserPublic | undefined> {
+    return this.userPublicRepository.findOneBy({ id });
   }
 
   async createUser(createUserDetail: CreateUser) {
@@ -71,7 +71,14 @@ export class UsersService {
   }
 
   async getPublicUser(phoneNumber: string): Promise<UserPublic | undefined> {
+    console.log(phoneNumber);
     return this.userPublicRepository.findOneBy({ phoneNumber });
+  }
+
+  async getPublicUserById(id: number): Promise<UserPublic | undefined> {
+    return await this.userPublicRepository.findOne({
+      where: { id },
+    });
   }
 
   async createUserPublic(
@@ -85,7 +92,9 @@ export class UsersService {
   }
 
   async editPublicUser(createUserPublicDetail: editPublicUser, hUser: any) {
-    const user = await this.getPublicUser(hUser.sub);
+    console.log(hUser, 'huser');
+    const user = await this.getPublicUserById(hUser);
+    console.log('user', user);
     const updatedUser = await this.userPublicRepository.update(user.id, {
       ...createUserPublicDetail,
     });

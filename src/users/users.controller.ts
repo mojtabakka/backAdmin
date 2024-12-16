@@ -54,13 +54,13 @@ export class UsersController {
     @Res() res: Response,
     @Req() req,
   ) {
-    // const data = await this.userService.editPublicUser(
-    //   editPublicUserDto,
-    //   req.user.phoneNumber,
-    // );
-    // res.status(HttpStatus.OK).json({
-    //   data,
-    // });
+    const data = await this.userService.editPublicUser(
+      editPublicUserDto,
+      req.user.sub,
+    );
+    res.status(HttpStatus.OK).json({
+      data,
+    });
   }
 
   @Patch()

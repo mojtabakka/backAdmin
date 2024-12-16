@@ -8,10 +8,18 @@ import { User } from 'src/typeorm/entities/User';
 import { Role } from 'src/typeorm/entities/Role';
 import { ProductPhoto } from 'src/typeorm/entities/ProductPhoto';
 import { UserPublic } from 'src/typeorm/entities/UserPublic';
+import { Category } from 'src/typeorm/entities/Category';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Product, User, Role, ProductPhoto, UserPublic]),
+    TypeOrmModule.forFeature([
+      Product,
+      User,
+      Role,
+      ProductPhoto,
+      UserPublic,
+      Category,
+    ]),
   ],
   exports: [TypeOrmModule],
   providers: [ProductService, UsersService],

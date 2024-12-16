@@ -32,8 +32,6 @@ export class AuthController {
   @Post('admin/login')
   @Public()
   async login(@Body() signInDto: SigninDto, @Res() res: Response) {
-    console.log('loggggigngngn');
-    
     const data = await this.authService.signIn(
       signInDto.phoneNumber,
       signInDto.password,
@@ -88,7 +86,7 @@ export class AuthController {
       expiration_time,
     );
     console.log(otpCode);
-    
+
     res.status(HttpStatus.OK).json({
       message: `otp sent to your phone`,
       data: {

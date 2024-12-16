@@ -1,6 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from 'src/typeorm/entities/Product';
+import { Brands } from 'src/typeorm/entities/Brands';
+import { Category } from 'src/typeorm/entities/Category';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
 import {
@@ -13,11 +15,16 @@ import { ProductStatuses } from 'src/constants';
 import { isEmptyArray } from 'src/common/utils/functions.utils';
 import { PageDto } from 'src/dtos/page.dto';
 import { PageMetaDto, PageOptionsDto } from 'src/dtos';
+import { groupBy } from 'lodash';
 @Injectable()
 export class ProductService {
   constructor(
+    @InjectRepository(Category)
+    private categoryPhotoRepository: Repository<Category>,
     @InjectRepository(Product)
     private productRepository: Repository<Product>,
+    @InjectRepository(Product)
+    private brandRepository: Repository<Brands>,
     @InjectRepository(ProductPhoto)
     private productPhotoRepository: Repository<ProductPhoto>,
     private usersService: UsersService,
@@ -99,44 +106,68 @@ export class ProductService {
     pageOptionsDto: PageOptionsDto,
   ): Promise<PageDto<Product>> {
     const { catId, properties, brand, type } = filter;
+
     const queryBuilder = this.productRepository
       .createQueryBuilder('product')
+      .select('product.model', 'model')
+      .addSelect('MAX(product.priceForUser)', 'priceForUser')
+      .addSelect('MAX(product.warranty)', 'warranty')
+      .addSelect('MAX(product.deliveryMethod)', 'deliveryMethod')
+      .addSelect('MAX(product.off)', 'off')
+      .addSelect('COUNT(product.id)', 'productCount')
       .leftJoinAndSelect('product.photos', 'photos');
-    if (properties) {
-      const filter = !isEmptyArray(properties) ? properties : [properties];
+
+    // Ensure properties is an array
+    const propertyFilter = Array.isArray(properties)
+      ? properties
+      : properties
+      ? [properties]
+      : [];
+
+    if (propertyFilter.length > 0) {
       queryBuilder
         .leftJoinAndSelect('product.properties', 'properties')
-        .where('properties.id IN(:...ids) ', { ids: filter });
+        .andWhere('properties.id IN(:...ids)', { ids: propertyFilter });
     }
+
     if (brand) {
       queryBuilder
         .leftJoinAndSelect('product.brand', 'brand')
-        .andWhere('brand.id= :id ', { id: Number(brand) });
+        .andWhere('brand.id = :id', { id: Number(brand) });
     }
 
     if (type) {
       queryBuilder
         .leftJoinAndSelect('product.productTypes', 'productTypes')
-        .andWhere('productTypes.id= :id ', { id: Number(type) });
+        .andWhere('productTypes.id = :id', { id: Number(type) });
     }
 
     if (catId) {
       queryBuilder
         .leftJoinAndSelect('product.category', 'category')
-        .andWhere('category.id=:catId ', { catId });
+        .andWhere('category.id = :catId', { catId });
     }
+
+    // Grouping, ordering, and pagination
     queryBuilder
+      .orderBy('product.created_at', pageOptionsDto.order || 'DESC')
       .groupBy('product.model')
-      .addSelect(' COUNT(*) OVER() ', 'ctn')
-      .orderBy('product.created_at', pageOptionsDto.order)
       .offset(pageOptionsDto.skip)
       .limit(pageOptionsDto.take);
 
-    const itemCount = (await queryBuilder.getRawMany())[0]?.ctn;
-    const { entities } = await queryBuilder.getRawAndEntities();
+    // Fetch raw count and entities
+    const result = await queryBuilder.getRawAndEntities();
+
+    // Access raw data and entities separately
+    const rawResults = result.raw;
+
+    // Extract itemCount from raw results
+    const itemCount = rawResults.length > 0 ? rawResults[0].ctn : 0;
+
+    // Prepare pagination metadata
     const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
 
-    return new PageDto(entities, pageMetaDto);
+    return new PageDto(result.raw, pageMetaDto);
   }
 
   async getProductForPublic(model: string): Promise<Product | undefined> {
@@ -273,30 +304,56 @@ export class ProductService {
     return finalProducts.filter((item) => item !== null)[0];
   }
 
-  async searchProduct(searchItem: string): Promise<Product[] | undefined> {
-    const updateProduct = await this.productRepository
+  async searchProduct(searchItem: string): Promise<any> {
+    const products = await this.productRepository
       .createQueryBuilder('product')
+      .select([
+        'product.model', // Group by model
+        'product.priceForUser', // Include specific columns
+        'category.title', // Include related category field
+        'COUNT(product.id) AS productCount', // Example aggregate
+      ])
       .where(
-        'product.model LIKE :searchItem OR product.priceForUser LIKE :searchItem ',
-        {
-          searchItem: `%${searchItem}%`,
-        },
+        'product.model LIKE :searchItem OR product.priceForUser LIKE :searchItem',
+        { searchItem: `%${searchItem}%` },
       )
+      .leftJoin('product.category', 'category')
       .groupBy('product.model')
-      .getMany();
-    return updateProduct;
+      .addGroupBy('category.title')
+      .addGroupBy('category.id')
+      .getRawMany();
+
+    const brands = await this.brandRepository.query(
+      'SELECT title, brand FROM brands WHERE title LIKE ? OR brand LIKE ?',
+      [`%${searchItem}%`, `%${searchItem}%`],
+    );
+
+    const category = await this.categoryPhotoRepository.query(
+      'SELECT id, title FROM category WHERE title LIKE ?',
+      [`%${searchItem}%`],
+    );
+
+    const result = {
+      products,
+      brands,
+      category,
+    };
+
+    return result;
   }
 
   async getProductNotReserved(
-    ids: Array<string>,
+    ids: Array<number>,
     model: string,
   ): Promise<Product | undefined> {
     const queryBuilder = await this.productRepository
       .createQueryBuilder('product')
       .leftJoinAndSelect('product.photos', 'photos')
       .where('orderId is null and model=:model', { model });
-    if (ids) {
-      queryBuilder.andWhere(' product.id NOT IN(:...ids) ', { ids });
+    if (ids && !isEmptyArray(ids)) {
+      queryBuilder.andWhere(' product.id NOT IN(:...ids) ', {
+        ids,
+      });
     }
     return queryBuilder.getOne();
   }

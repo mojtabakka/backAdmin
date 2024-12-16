@@ -4,6 +4,7 @@ import { Address } from 'src/typeorm/entities/Address';
 import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
 import { CreateAddress } from './utils/types';
+import { editddressDto } from './dtos/eidtAddress.dto';
 
 @Injectable()
 export class AddressService {
@@ -63,6 +64,21 @@ export class AddressService {
 
     const result = await this.addressRepository.save(address);
     return result;
+  }
+
+  async editAddress(
+    addressId: number,
+    updateAddressDto: editddressDto,
+  ): Promise<any> {
+    const address = await this.addressRepository.findOne({
+      where: { id: addressId },
+    });
+    if (!address) {
+      throw new Error('Address not found');
+    }
+    Object.assign(address, updateAddressDto);
+    const updatedAddress = await this.addressRepository.save(address);
+    return updatedAddress;
   }
 
   async changeActiveAddress(addressId: number, userInfo: any) {

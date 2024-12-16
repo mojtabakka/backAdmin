@@ -40,7 +40,7 @@ export class Address extends AbstractEntity {
   })
   user: UserPublic;
 
-  @OneToMany(() => Orders, (orders) => orders.address, { cascade: true })
+  @OneToMany(() => Orders, (orders) => orders.address)
   orders: Orders[];
 
   @Column({ nullable: true })

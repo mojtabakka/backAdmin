@@ -74,7 +74,7 @@ export class AuthService {
 
     if (checkUserBuyPhounNumber) {
       throw new HttpException(
-        `کاربر با شماره تماس  ${registerAdminDetail.phoneNumber } در سامانه ثبت نام شده است`,
+        `کاربر با شماره تماس  ${registerAdminDetail.phoneNumber} در سامانه ثبت نام شده است`,
         HttpStatus.UNAUTHORIZED,
       );
     }

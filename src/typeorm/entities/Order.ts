@@ -46,7 +46,7 @@ export class Orders extends AbstractEntity {
   products: Product[];
 
   @ManyToOne(() => Address, (address) => address.orders, {
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
   })
   address: Address;
 }
