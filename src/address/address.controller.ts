@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Put,
   Req,
   Res,
 } from '@nestjs/common';
@@ -34,7 +35,6 @@ export class AddressController {
   @Roles(Role.User)
   @Get('get-active-address')
   async getActiveAddress(@Req() req, @Res() res) {
-    console.log(req);
     const address = await this.addressService.getActiveAddress(req.user.sub);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
@@ -84,7 +84,7 @@ export class AddressController {
   }
 
   @Roles(Role.User)
-  @Post('change-active-address/:id')
+  @Put('change-active-address/:id')
   async changeActiveAddress(
     @Param('id') id: number,
     @Req()

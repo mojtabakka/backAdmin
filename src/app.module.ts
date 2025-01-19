@@ -34,6 +34,8 @@ import { Properties } from './typeorm/entities/Properties';
 import { ConfigModule } from '@nestjs/config';
 import { CategoryModule } from './category/category.module';
 import { env } from 'process';
+import { PropertiesModule } from './properties/properties.module';
+// import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -46,14 +48,12 @@ import { env } from 'process';
       dest: './uplaods',
     }),
     TypeOrmModule.forRoot({
-      // @ts-ignore
-      type: env.DATABASE_NAME,
-      host: env.DATABASE_HOST ,
-      // @ts-ignore
-      port: env.DATABASE_PORT,
-      username: "root",
-      password: env.DATABASE_PASSWORD,
-      database: env.DATABASE,
+      type: 'mysql', // Make sure this is 'mysql' or 'mariadb', not 'shop'
+      host: process.env.DATABASE_HOST || 'localhost',
+      port: parseInt(process.env.DATABASE_PORT) || 3306,
+      username: process.env.DATABASE_USERNAME || 'root',
+      password: process.env.DATABASE_PASSWORD || '0019058101Aa@',
+      database: process.env.DATABASE_NAME || 'shop',
       entities: [
         User,
         Role,
@@ -81,6 +81,8 @@ import { env } from 'process';
     AddressModule,
     TypeModule,
     CategoryModule,
+    PropertiesModule,
+    // RedisModule,
   ],
   controllers: [AppController, ProductController],
   providers: [AppService, ProductService],

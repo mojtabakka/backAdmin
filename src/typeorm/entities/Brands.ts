@@ -26,7 +26,7 @@ export class Brands extends AbstractEntity {
   categories: Category[];
 
   @OneToMany(() => Product, (product) => product.brand, {
-    onDelete: 'CASCADE',
+    onDelete: 'SET NULL',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ referencedColumnName: 'id' })

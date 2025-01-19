@@ -43,7 +43,6 @@ export class AuthGuard implements CanActivate {
         'you can not access to this api',
         HttpStatus.FORBIDDEN,
       );
-
     const request = context.switchToHttp().getRequest();
     const token = request.headers.authorization;
     if (!token) {

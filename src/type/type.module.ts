@@ -16,6 +16,7 @@ import { PropertyTitles } from 'src/typeorm/entities/PropertyTitles';
       Category,
       Properties,
       PropertyTitles,
+      Properties,
     ]),
   ],
 

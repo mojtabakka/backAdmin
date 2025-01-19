@@ -19,7 +19,10 @@ export class Properties extends AbstractEntity {
   @Column({ nullable: true, charset: 'utf8' })
   property: string;
 
-  @ManyToOne(() => PropertyTitles, (pt) => pt.properties)
+  @ManyToOne(() => PropertyTitles, (pt) => pt.properties, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   propertyTitle: PropertyTitles;
 
   @ManyToMany(() => Product, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })

@@ -128,7 +128,6 @@ export class OrdersService {
       }
       //--------------
       const currentCart = await this.getCurrentCartWithCartId(idCart);
-      console.log(currentCart);
       return {
         cartId: idCart,
         count: +currentCart?.products.filter(
@@ -331,10 +330,9 @@ export class OrdersService {
     userInfo: any,
   ): Promise<Orders | undefined> {
     let result;
-
     const currentOrder = await this.getCurrentOrder(userInfo.sub);
     const cart = await this.getCurrentBasketwithOutGorupBy(userInfo.sub);
-    const products = cart.products;
+    const products = cart?.products;
     const price = Math.round(cart.finalPrice);
     const finalPrice = Math.round(cart.finalPrice - cart.shippingPrice);
     const shippingPrice = cart.shippingPrice;
@@ -375,21 +373,21 @@ export class OrdersService {
         status: orderStatus.NotPayed,
       })
       .getOne();
-    console.log(order);
     return order;
   }
 
   async getCurrentOrders(id: number): Promise<Orders[] | undefined> {
     const result = await this.ordersRepository
       .createQueryBuilder('orders')
-      .leftJoinAndSelect('orders.cart', 'cart')
-      .leftJoinAndSelect('cart.products', 'products')
+      .leftJoinAndSelect('orders.products', 'products')
       .leftJoinAndSelect('products.photos', 'photos')
-      .where('NOT orders.status=:status  and orders.userId=:id', {
+      .where('orders.status != :status AND orders.userId = :id', {
         status: orderStatus.Completed,
         id,
       })
+      .orderBy('orders.created_at', 'DESC')
       .getMany();
+    console.log(result);
     return result;
   }
 
@@ -470,12 +468,13 @@ export class OrdersService {
     });
 
     const userId = order.user.id;
-    await this.basketRepository
+    const basket = await this.basketRepository
       .createQueryBuilder('basket')
-      .delete()
-      .from(Basket)
-      .where('userId=:userId', { userId })
-      .execute();
+      .where('userId = :userId', { userId })
+      .getOne();
+
+    basket.products = [];
+    await this.basketRepository.save(basket);
 
     return null;
   }

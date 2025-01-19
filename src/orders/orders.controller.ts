@@ -36,8 +36,6 @@ export class OrdersController {
   @Roles(Role.User)
   @Get('current-orders')
   async getCurrentOrders(@Req() req, @Res() res) {
-    console.log('hello');
-
     const orders = await this.orderService.getCurrentOrders(req.user.sub);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
@@ -227,7 +225,7 @@ export class OrdersController {
   }
 
   @Roles(Role.Admin)
-  @Get('search-order-admin')
+  @Get('`search-order-admin`')
   async searchProductsAdmin(
     @Query() pageOptionsDto: PageOptionsDto,
     @Query() searchOrderDto: SearchOrderDto,

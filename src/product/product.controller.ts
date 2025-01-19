@@ -36,9 +36,8 @@ export class ProductController {
     @Req() req,
     @Res() res: Response,
   ) {
-    const data: Product[] | undefined = await this.productService.createProduct(
+    const data = await this.productService.createProduct(
       createProductDto,
-      createProductDto.numberOfExist,
       req.user.username,
     );
     res.status(HttpStatus.OK).json({
@@ -48,7 +47,8 @@ export class ProductController {
   }
 
   @Post('upload-product-image')
-  @Roles(Role.Admin)
+  // @Roles(Role.Admin)
+  @Public()
   @UseInterceptors(
     FilesInterceptor('photo', 20, {
       storage: diskStorage({
@@ -122,6 +122,16 @@ export class ProductController {
     });
   }
 
+  @Get('bymodel/:model')
+  @Public()
+  async getProductByModel(@Param('model') model: string, @Res() res: Response) {
+    const data = await this.productService.getProductByModel(model);
+    res.status(HttpStatus.OK).json({
+      message: 'product recieved successfully',
+      data,
+    });
+  }
+
   @Delete(':model')
   @Roles(Role.Admin)
   async deleteProduct(@Param('model') model: string, @Res() res: Response) {
@@ -135,10 +145,25 @@ export class ProductController {
   @Roles(Role.Admin)
   async editProduct(
     @Param('model') model: string,
-    @Body() editProductDto: EditProductDto,
+    @Body() editProductDto: CreateProductDto,
     @Res() res: Response,
+    @Req() req,
   ) {
-    const data = await this.productService.editProduct(model, editProductDto);
+    const data = await this.productService.editProduct(
+      model,
+      editProductDto,
+      req.user.username,
+    );
+    res.status(HttpStatus.OK).json({
+      message: 'Product Updated successfully',
+      data,
+    });
+  }
+
+  @Get('available/:model')
+  @Roles(Role.Admin)
+  async getAvailable(@Param('model') model: string, @Res() res: Response) {
+    const data = await this.productService.AvailableProducts(model);
     res.status(HttpStatus.OK).json({
       message: 'Product Updated successfully',
       data,

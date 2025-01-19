@@ -17,8 +17,8 @@ export class PropertyTitles extends AbstractEntity {
   title: string;
 
   @ManyToOne(() => Category, (user) => user.propertyTitles, {
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+    onUpdate: 'SET NULL',
   })
   category: Category;
 

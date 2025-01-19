@@ -9,6 +9,9 @@ import { Role } from 'src/typeorm/entities/Role';
 import { ProductPhoto } from 'src/typeorm/entities/ProductPhoto';
 import { UserPublic } from 'src/typeorm/entities/UserPublic';
 import { Category } from 'src/typeorm/entities/Category';
+import { Properties } from 'src/typeorm/entities/Properties';
+import { ProductTypes } from 'src/typeorm/entities/ProductTypes';
+import { Brands } from 'src/typeorm/entities/Brands';
 
 @Module({
   imports: [
@@ -19,6 +22,10 @@ import { Category } from 'src/typeorm/entities/Category';
       ProductPhoto,
       UserPublic,
       Category,
+      Properties,
+      ProductTypes,
+      Properties,
+      Brands,
     ]),
   ],
   exports: [TypeOrmModule],

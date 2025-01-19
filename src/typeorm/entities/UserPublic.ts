@@ -34,6 +34,9 @@ export class UserPublic extends AbstractEntity {
   phoneNumber: string;
 
   @Column({ nullable: true })
+  birthDate: Date;
+
+  @Column({ nullable: true })
   password: string;
 
   @Column({ nullable: true })

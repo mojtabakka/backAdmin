@@ -1,9 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
+  Param,
   Post,
+  Put,
   Query,
   Req,
   Res,
@@ -18,6 +21,7 @@ import { Public } from 'src/auth/decorators/public.decorator';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { Response, Request } from 'express';
 import { diskStorage } from 'multer';
+import { PageOptionsDto } from 'src/dtos';
 
 @Controller('category')
 export class CategoryController {
@@ -32,10 +36,24 @@ export class CategoryController {
     });
   }
 
+  @Put(':id')
+  @Roles(Role.Admin)
+  async editCategory(
+    @Body() createCatDto: CreateCatDto,
+    @Res() res,
+    @Param('id') id: number,
+  ) {
+    const data = await this.categoryService.EditCategory(id, createCatDto);
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data,
+    });
+  }
+
   @Get()
   @Public()
-  async getcats(@Res() res) {
-    const data = await this.categoryService.getCats();
+  async getcats(@Res() res, @Query() pageOptionsDto: PageOptionsDto) {
+    const data = await this.categoryService.getCats(pageOptionsDto);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
       data,
@@ -43,12 +61,14 @@ export class CategoryController {
   }
 
   @Post('upload-category-image')
-  @Roles(Role.Admin)
+  @Public()
+  // @Roles(Role.Admin)
   @UseInterceptors(
     FilesInterceptor('photo', 20, {
       storage: diskStorage({
         destination: 'public/asset/images/category',
         filename: (req, file, cb) => {
+          console.log(file);
           cb(null, Date.now() + '_category' + file.originalname);
         },
       }),
@@ -77,5 +97,28 @@ export class CategoryController {
       message: 'successfully',
       data,
     });
+  }
+
+  @Get('get-cat')
+  @Public()
+  async getCatAdmin(@Query() query, @Res() res) {
+    console.log(query);
+    const data = await this.categoryService.getCat(query.id);
+    res.status(HttpStatus.OK).json({
+      message: 'successfully',
+      data,
+    });
+  }
+
+  @Delete(':id')
+  @Roles(Role.Admin)
+  async deleteProperty(@Res() res, @Param('id') id: string) {
+    const deletedProperty = await this.categoryService.removeCategory(id);
+    if (!deletedProperty) {
+      return res.status(HttpStatus.NOT_FOUND).json({
+        message: 'Property not found',
+      });
+    }
+    res.status(HttpStatus.OK).json({ message: 'deleted successfully' });
   }
 }

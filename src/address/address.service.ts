@@ -37,8 +37,6 @@ export class AddressService {
         id,
       })
       .getOne();
-    console.log(address);
-
     return address;
   }
 

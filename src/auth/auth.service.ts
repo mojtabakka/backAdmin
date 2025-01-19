@@ -1,16 +1,11 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterAdmin } from './utils/types/registerAdmin';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/typeorm/entities/User';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { Otp } from 'src/typeorm/entities/Otp';
 
 @Injectable()
@@ -46,7 +41,11 @@ export class AuthService {
         HttpStatus.UNAUTHORIZED,
       );
     }
-    const payload = { phoneNumber: user.phoneNumber, sub: user.id };
+    const payload = {
+      phoneNumber: user.phoneNumber,
+      sub: user.id,
+      fullName: user.name + ' ' + user.lastName,
+    };
     const token = await this.jwtService.signAsync(payload);
     return {
       token,
@@ -110,7 +109,11 @@ export class AuthService {
   }
 
   async signInPublic(user: User) {
-    const payload = { phoneNumber: user.phoneNumber, sub: user.id };
+    const payload = {
+      phoneNumber: user.phoneNumber,
+      sub: user.id,
+      fullName: (user?.name || '') + ' ' + (user?.lastName || ''),
+    };
     const token = await this.jwtService.signAsync(payload);
     return {
       token,

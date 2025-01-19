@@ -71,7 +71,6 @@ export class UsersService {
   }
 
   async getPublicUser(phoneNumber: string): Promise<UserPublic | undefined> {
-    console.log(phoneNumber);
     return this.userPublicRepository.findOneBy({ phoneNumber });
   }
 
@@ -92,9 +91,7 @@ export class UsersService {
   }
 
   async editPublicUser(createUserPublicDetail: editPublicUser, hUser: any) {
-    console.log(hUser, 'huser');
     const user = await this.getPublicUserById(hUser);
-    console.log('user', user);
     const updatedUser = await this.userPublicRepository.update(user.id, {
       ...createUserPublicDetail,
     });

@@ -32,7 +32,7 @@ export class UsersController {
   @Get()
   @Roles(Role.Admin)
   async getUser(@Res() res: Response, @Req() req) {
-    const data = await this.userService.findOne(req.user.username);
+    const data = await this.userService.findOne(req.user.sub);
     res.status(HttpStatus.OK).json({
       data,
     });
@@ -76,6 +76,7 @@ export class UsersController {
   @Put('addRole/:id')
   @Public()
   setUserRole(@Param('id') id: number, @Body() role) {
-    return this.userService.setUserRole(id, role.role);
+    console.log(role.role)
+    return this.userService.setUserRole(id, "admin");
   }
 }
