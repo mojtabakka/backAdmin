@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependenciess
-RUN npm install
+RUN yarn install
 
 # Rebuild native modules (like bcrypt)
 RUN npm rebuild bcrypt --build-from-source
@@ -19,7 +19,7 @@ RUN npm rebuild bcrypt --build-from-source
 COPY . .
 
 # Build the NestJS app
-RUN npm run build
+RUN yarn run build
 
 # Expose the port that NestJS listens on
 EXPOSE 3000

@@ -36,6 +36,7 @@ import { CategoryModule } from './category/category.module';
 import { env } from 'process';
 import { PropertiesModule } from './properties/properties.module';
 // import { RedisModule } from './redis/redis.module';
+import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { PropertiesModule } from './properties/properties.module';
     TypeModule,
     CategoryModule,
     PropertiesModule,
+    RoleModule,
     // RedisModule,
   ],
   controllers: [AppController, ProductController],

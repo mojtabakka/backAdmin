@@ -13,6 +13,8 @@ import { Otp } from 'src/typeorm/entities/Otp';
 import { UserPublic } from 'src/typeorm/entities/UserPublic';
 import { UsersService } from 'src/users/users.service';
 import { jwtConstants } from 'src/common/constants/config';
+import { AdminSeederService } from 'src/seed/admin-seeder.service';
+import { RoleService } from 'src/role/role.service';
 
 @Module({
   imports: [
@@ -26,14 +28,16 @@ import { jwtConstants } from 'src/common/constants/config';
   ],
   providers: [
     AuthService,
+    AdminSeederService,
     LocalStrategy,
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
     },
     UsersService,
+    RoleService
   ],
   exports: [AuthService],
   controllers: [AuthController],
 })
-export class AuthModule {}
+export class AuthModule { }

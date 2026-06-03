@@ -85,12 +85,12 @@ export class AuthController {
       otpCode,
       expiration_time,
     );
-    console.log(otpCode);
 
     res.status(HttpStatus.OK).json({
       message: `otp sent to your phone`,
       data: {
         sent: true,
+        otpCode
       },
     });
   }
