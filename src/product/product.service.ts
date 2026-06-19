@@ -40,17 +40,18 @@ export class ProductService {
     private propertyPhotoRepository: Repository<Properties>,
 
     private usersService: UsersService,
-  ) {}
+  ) { }
 
   createProduct = async (data: CreateProductDetail, username: string) => {
     const user = await this.usersService.findOne(username);
-
     const brand = await this.brandRepository.findOneOrFail({
       where: { id: parseInt(data.brand) },
     });
     const category = await this.categoryPhotoRepository.findOneOrFail({
       where: { id: parseInt(data.category) },
     });
+
+
 
     const productType = await this.productTypesRepository.findOneOrFail({
       where: { id: parseInt(data.types) },
@@ -59,6 +60,7 @@ export class ProductService {
     const productPhoto = await this.productPhotoRepository.findOneOrFail({
       where: { id: parseInt(data.photo) },
     });
+
 
     const properties = await Promise.all(
       data.properties.map(async (prop) => {
@@ -99,15 +101,14 @@ export class ProductService {
     return this.productPhotoRepository.save(photoUrl);
   }
 
-  async getProducts(pageOptionsDto: PageOptionsDto): Promise<PageDto<Product>> {
-    console.log('hello');
+  async getProducts(pageOptionsDto: PageOptionsDto): Promise<PageDto<any>> {
     const { page, take } = pageOptionsDto;
 
-    const queryBuilder = this.productRepository
+    const qb = this.productRepository
       .createQueryBuilder('product')
       .select('product.model', 'model')
-      .addSelect('COUNT(*)', 'count')
-      .addSelect('product.id', 'id')
+      .addSelect('COUNT(product.id)', 'count')
+      .addSelect('MIN(product.id)', 'id')
       .where((qb) => {
         const subQuery = qb
           .subQuery()
@@ -115,24 +116,30 @@ export class ProductService {
           .from(Product, 'p')
           .where('p.model = product.model')
           .getQuery();
+
         return `product.id = ${subQuery}`;
       })
       .groupBy('product.model')
       .orderBy('product.model', 'ASC')
-      .offset((page - 1) * take)
-      .limit(take);
+      .skip((page - 1) * take)
+      .take(take);
 
-    // دریافت تعداد کل نتایج
-    const itemCount = (await queryBuilder.getRawMany())[0]?.ctn;
+    const data = await qb.getRawMany();
 
-    // دریافت داده‌ها و نهادهای واقعی (products)
-    const { entities } = await queryBuilder.getRawAndEntities();
+    const itemCount = (
+      await this.productRepository
+        .createQueryBuilder('product')
+        .select('product.model')
+        .groupBy('product.model')
+        .getRawMany()
+    ).length;
 
-    // ایجاد متا دیتا برای صفحه‌بندی
-    const pageMetaDto = new PageMetaDto({ itemCount, pageOptionsDto });
+    const pageMetaDto = new PageMetaDto({
+      itemCount,
+      pageOptionsDto,
+    });
 
-    // بازگشت به عنوان PageDto
-    return new PageDto(entities, pageMetaDto);
+    return new PageDto(data, pageMetaDto);
   }
 
   async getProductsForPublic(
@@ -159,8 +166,8 @@ export class ProductService {
     const propertyFilter = Array.isArray(cleanedproperties)
       ? cleanedproperties
       : cleanedproperties
-      ? [cleanedproperties]
-      : [];
+        ? [cleanedproperties]
+        : [];
     if (propertyFilter.length === 1 && propertyFilter[0] === 0)
       propertyFilter.pop();
 
@@ -182,7 +189,7 @@ export class ProductService {
         .andWhere('productTypes.id = :id', { id: Number(type) });
     }
 
-    if (catId) {
+    if (catId && catId.toString() !== 'null') {
       queryBuilder
         .leftJoinAndSelect('product.category', 'category')
         .andWhere('category.id = :catId', { catId });

@@ -42,7 +42,6 @@ export class TypeController {
   @Delete(':id')
   @Roles(Role.Admin)
   async deleteProductTypes(@Res() res, @Param('id') id: number) {
-    console.log(id);
     const data = await this.typeService.DeleteProdcutType(id);
     res.status(HttpStatus.OK).json({
       data,

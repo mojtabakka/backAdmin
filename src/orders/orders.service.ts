@@ -1,6 +1,6 @@
 import { Injectable, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Response } from 'express';
+import { query, Response } from 'express';
 import { AddressService } from 'src/address/address.service';
 import { isEmptyArray, isEmptyObject } from 'src/common/utils/functions.utils';
 import { orderStatus } from 'src/constants';
@@ -24,7 +24,7 @@ export class OrdersService {
     private ordersRepository: Repository<Orders>,
     @InjectRepository(Basket)
     private basketRepository: Repository<Basket>,
-  ) {}
+  ) { }
 
   async removeOrder(model: string, userInfo, res: Response) {
     let mySumPrice = 0;
@@ -189,36 +189,34 @@ export class OrdersService {
   }
 
   async getCurrentCartWithCartId(id: number) {
-    const queryBuilder = await this.basketRepository
+    const basket = await this.basketRepository
       .createQueryBuilder('basket')
       .leftJoinAndSelect('basket.products', 'products')
       .leftJoinAndSelect('products.photos', 'productPhotos')
-      .where('basket.id=:id', {
-        id,
-      })
+      .where('basket.id = :id', { id })
+      .loadRelationCountAndMap('basket.total', 'basket.products')
       .getOne();
-    return queryBuilder;
+    return basket;
+
   }
 
   async getCurrentCartWithCartIdAndProductModelCount(
     id: number,
     model: string,
   ) {
-    const productInBasket = await this.basketRepository
+    const basket = await this.basketRepository
       .createQueryBuilder('basket')
-      .leftJoinAndSelect('basket.products', 'products')
-      .where(' basket.id=:id  ', {
-        model,
-        id: id,
-      })
+      .leftJoin('basket.products', 'products')
+      .where('basket.id = :id', { id })
+      .andWhere('products.model = :model', { model })
+      .select(['basket.id', 'products.id', 'products.model'])
       .getOne();
+    const products = basket?.products ?? [];
 
-    return {
-      count:
-        productInBasket?.products.filter((item) => item.model === model)
-          .length || 0,
-      total: productInBasket?.products.length || 0,
-    };
+    const total = products.length;
+    const count = products.filter(p => p.model === model).length;
+
+    return { count, total };
   }
 
   async getCurrentCartWithCartIdAndProductModel(id: number, model: string) {
@@ -239,10 +237,21 @@ export class OrdersService {
     const basket = await this.basketRepository
       .createQueryBuilder('basket')
       .leftJoinAndSelect('basket.products', 'products')
+      .leftJoinAndSelect('basket.user', 'user')
       .where('basket.userId=:id', {
         id,
       })
       .getOne();
+
+
+    const baskets = await this.basketRepository
+      .createQueryBuilder('basket')
+      .leftJoinAndSelect('basket.products', 'products')
+      .leftJoinAndSelect('basket.user', 'user')
+      // .where('basket.userId=:id', {
+      //   id,
+      // })
+      .getMany();
     return basket;
   }
 
@@ -258,7 +267,7 @@ export class OrdersService {
   }
 
   async AddToCartAfterLogin(cartId, id: number) {
-    let Fakecart;
+    let Fakecart: Basket;
     const mainCart = await this.basketRepository
       .createQueryBuilder('basket')
       .leftJoinAndSelect('basket.products', 'products')
@@ -267,7 +276,7 @@ export class OrdersService {
       })
       .getOne();
 
-    if (cartId) {
+    if (cartId && cartId !== null) {
       Fakecart = await this.basketRepository
         .createQueryBuilder('basket')
         .leftJoinAndSelect('basket.products', 'products')
@@ -277,7 +286,7 @@ export class OrdersService {
         .getOne();
     }
 
-    if (mainCart && Fakecart) {
+    if (mainCart && mainCart !== null && Fakecart && Fakecart !== null) {
       const products = uniqBy(
         [...Fakecart?.products, ...mainCart?.products],
         'id',
@@ -289,13 +298,15 @@ export class OrdersService {
         cartId: mainCart.id,
         total: products.length,
       };
-    } else if (mainCart && !Fakecart) {
+    } else if (mainCart && mainCart !== null && (!Fakecart || Fakecart !== null)) {
       return {
         cartId: mainCart.id,
         total: mainCart.products.length,
       };
-    } else if (!mainCart && Fakecart) {
-      Fakecart.userId = id;
+    }
+    else if ((!mainCart || mainCart === null) && Fakecart && Fakecart !== null) {
+      const user = await this.userService.getPublicUserById(id);
+      Fakecart.user = user
       await this.basketRepository.save(Fakecart);
       return {
         cartId: Fakecart.id,
@@ -333,8 +344,9 @@ export class OrdersService {
     const currentOrder = await this.getCurrentOrder(userInfo.sub);
     const cart = await this.getCurrentBasketwithOutGorupBy(userInfo.sub);
     const products = cart?.products;
-    const price = Math.round(cart.finalPrice);
-    const finalPrice = Math.round(cart.finalPrice - cart.shippingPrice);
+
+    const price = Math.round(cart?.finalPrice);
+    const finalPrice = Math.round(cart?.finalPrice - cart?.shippingPrice);
     const shippingPrice = cart.shippingPrice;
     const activeAddress = await this.addressService.getActiveAddress(
       userInfo?.sub,
@@ -387,7 +399,6 @@ export class OrdersService {
       })
       .orderBy('orders.created_at', 'DESC')
       .getMany();
-    console.log(result);
     return result;
   }
 

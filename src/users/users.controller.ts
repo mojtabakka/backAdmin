@@ -76,7 +76,6 @@ export class UsersController {
   @Put('addRole/:id')
   @Public()
   setUserRole(@Param('id') id: number, @Body() role) {
-    console.log(role.role)
     return this.userService.setUserRole(id, "admin");
   }
 }

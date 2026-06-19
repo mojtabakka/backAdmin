@@ -27,10 +27,11 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private userService: UsersService,
-  ) {}
+  ) { }
   @HttpCode(HttpStatus.OK)
   @Post('admin/login')
   @Public()
+
   async login(@Body() signInDto: SigninDto, @Res() res: Response) {
     const data = await this.authService.signIn(
       signInDto.phoneNumber,
@@ -141,5 +142,21 @@ export class AuthController {
         token,
       },
     });
+  }
+
+
+  @Public()
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@Res({ passthrough: true }) res: Response) {
+    res.cookie('token', '', {
+      httpOnly: true,
+      path: '/',
+      expires: new Date(0),
+      maxAge: 0,
+    });
+    return {
+      message: 'Logged out successfully',
+    };
   }
 }

@@ -47,8 +47,6 @@ export class CategoryService {
     const propertyTitles = await this.propertyTitleRepository.findBy({
       id: In(createCatDetail.properties.map(Number)),
     });
-
-    console.log(createCatDetail.photo);
     const cat = this.catergoryRepository.create({
       photo: createCatDetail.photo,
       title: createCatDetail.type.trim(),

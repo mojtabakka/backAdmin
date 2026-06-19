@@ -102,7 +102,6 @@ export class CategoryController {
   @Get('get-cat')
   @Public()
   async getCatAdmin(@Query() query, @Res() res) {
-    console.log(query);
     const data = await this.categoryService.getCat(query.id);
     res.status(HttpStatus.OK).json({
       message: 'successfully',
